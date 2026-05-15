@@ -8,60 +8,58 @@ import { prettyDate } from "../../utils/dateHelpers";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
-// ── Inner form (must be inside <Elements>) ─────────────────────────────────
 function CheckoutForm({ property, range, nights, total, onConfirm, onClose }) {
   const stripe   = useStripe();
   const elements = useElements();
-  const [step, setStep]   = useState("details"); // details | processing | done | error
+  const [step, setStep]     = useState("details");
   const [errMsg, setErrMsg] = useState("");
-  const [code]             = useState(() => "HH-" + Math.random().toString(36).slice(2, 7).toUpperCase());
+  const [ready, setReady]   = useState(false);
+  const [code] = useState(() => "HH-" + Math.random().toString(36).slice(2, 7).toUpperCase());
 
   const fee = +(total * 0.029 + 0.3).toFixed(2);
 
   const pay = async () => {
     if (!stripe || !elements) return;
+    // Don't unmount the PaymentElement before confirmPayment runs —
+    // show processing overlay instead, keeping the element in the DOM
     setStep("processing");
     setErrMsg("");
-
-    const { error } = await stripe.confirmPayment({
-      elements,
-      // Redirect back to the same page after 3D Secure (if needed)
-      confirmParams: { return_url: window.location.href },
-      // Don't redirect if no redirect is required (card payments)
-      redirect: "if_required",
-    });
-
-    if (error) {
-      setErrMsg(error.message);
+    try {
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        confirmParams: { return_url: window.location.href },
+        redirect: "if_required",
+      });
+      if (error) {
+        setErrMsg(error.message);
+        setStep("details");
+      } else if (paymentIntent && paymentIntent.status === "succeeded") {
+        onConfirm();
+        setStep("done");
+      }
+    } catch (err) {
+      setErrMsg(err.message);
       setStep("details");
-    } else {
-      onConfirm();
-      setStep("done");
     }
   };
 
   return (
     <>
+      {/* Close button — hidden while processing */}
       {step !== "processing" && (
-        <button
-          className="hh-modal-x"
-          onClick={() => onClose(step === "done")}
-          aria-label="Close"
-        >
+        <button className="hh-modal-x" onClick={() => onClose(step === "done")} aria-label="Close">
           <Icon d={icons.close} size={18} />
         </button>
       )}
 
-      {/* ── details ── */}
-      {(step === "details") && (
+      {/* ── Details — always stays in the DOM so PaymentElement never unmounts ── */}
+      <div style={{ display: step === "details" ? "block" : "none" }}>
         <div className="hh-modal-body">
           <p className="hh-kicker">Secure payment via Stripe</p>
           <h2 className="hh-modal-title">Confirm &amp; pay</h2>
 
           <div className="hh-pay-summary">
-            <div className="hh-pay-sum-photo">
-              <PhotoMark label={property.name} />
-            </div>
+            <div className="hh-pay-sum-photo"><PhotoMark label={property.name} /></div>
             <div>
               <h3>{property.name}</h3>
               <p>{property.location}</p>
@@ -75,16 +73,15 @@ function CheckoutForm({ property, range, nights, total, onConfirm, onClose }) {
             </div>
           </div>
 
-          {/* Stripe-hosted card fields */}
           <div className="hh-stripe-element">
-            <PaymentElement />
+            <PaymentElement onReady={() => setReady(true)} />
           </div>
 
           {errMsg && <p className="hh-pay-error">{errMsg}</p>}
 
           <button
             className="hh-btn hh-btn-solid hh-btn-full"
-            disabled={!stripe || !elements}
+            disabled={!stripe || !ready}
             onClick={pay}
           >
             <Icon d={icons.lock} size={15} /> Pay ${total.toLocaleString()}
@@ -94,9 +91,9 @@ function CheckoutForm({ property, range, nights, total, onConfirm, onClose }) {
             no platform commission, unlike the ~14% a booking site would add.
           </p>
         </div>
-      )}
+      </div>
 
-      {/* ── processing ── */}
+      {/* ── Processing overlay ── */}
       {step === "processing" && (
         <div className="hh-modal-body hh-processing">
           <span className="hh-spinner" />
@@ -105,16 +102,12 @@ function CheckoutForm({ property, range, nights, total, onConfirm, onClose }) {
         </div>
       )}
 
-      {/* ── done ── */}
+      {/* ── Confirmed ── */}
       {step === "done" && (
         <div className="hh-modal-body hh-confirmed">
-          <span className="hh-confirmed-mark">
-            <Icon d={icons.check} size={30} />
-          </span>
+          <span className="hh-confirmed-mark"><Icon d={icons.check} size={30} /></span>
           <h2 className="hh-modal-title">Booking confirmed</h2>
-          <p className="hh-confirmed-sub">
-            You're all set! A receipt and check-in details are on their way.
-          </p>
+          <p className="hh-confirmed-sub">You're all set! A receipt and check-in details are on their way.</p>
           <div className="hh-confirmed-card">
             <div className="hh-confirmed-row"><span>Property</span><strong>{property.name}</strong></div>
             <div className="hh-confirmed-row">
@@ -126,16 +119,13 @@ function CheckoutForm({ property, range, nights, total, onConfirm, onClose }) {
             <div className="hh-confirmed-row"><span>Confirmation</span><strong>{code}</strong></div>
           </div>
           <ChannelSync />
-          <button className="hh-btn hh-btn-solid hh-btn-full" onClick={() => onClose(true)}>
-            Done
-          </button>
+          <button className="hh-btn hh-btn-solid hh-btn-full" onClick={() => onClose(true)}>Done</button>
         </div>
       )}
     </>
   );
 }
 
-// ── Outer shell — fetches clientSecret then mounts Elements ───────────────
 export default function PaymentModal({ property, range, nights, total, onConfirm, onClose }) {
   const [clientSecret, setClientSecret] = useState(null);
   const [fetchError,   setFetchError]   = useState("");
@@ -146,6 +136,7 @@ export default function PaymentModal({ property, range, nights, total, onConfirm
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
     fetch("/api/create-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -153,17 +144,19 @@ export default function PaymentModal({ property, range, nights, total, onConfirm
     })
       .then((r) => r.json())
       .then((data) => {
+        if (cancelled) return;
         if (data.error) throw new Error(data.error);
         setClientSecret(data.clientSecret);
       })
-      .catch((err) => setFetchError(err.message));
+      .catch((err) => {
+        if (cancelled) return;
+        setFetchError(err.message);
+      });
+    return () => { cancelled = true; };
   }, [total]);
 
   return (
-    <div
-      className="hh-modal-overlay"
-      onClick={() => onClose(false)}
-    >
+    <div className="hh-modal-overlay" onClick={() => onClose(false)}>
       <div
         className="hh-modal"
         onClick={(e) => e.stopPropagation()}
@@ -182,7 +175,11 @@ export default function PaymentModal({ property, range, nights, total, onConfirm
             <p>Preparing secure checkout…</p>
           </div>
         ) : (
-          <Elements stripe={stripePromise} options={{ clientSecret }}>
+          <Elements
+            key={clientSecret}
+            stripe={stripePromise}
+            options={{ clientSecret }}
+          >
             <CheckoutForm
               property={property}
               range={range}

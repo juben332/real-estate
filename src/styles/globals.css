@@ -343,7 +343,7 @@
 .hh-modal .hh-btn { margin-top: 18px; }
 .hh-pay-fineprint { font-size: 11.5px; color: var(--ink-soft); line-height: 1.55; margin-top: 12px; text-align: center; }
 .hh-pay-error { color: #c0392b; font-size: 13px; margin: 8px 0; }
-.hh-stripe-element { margin: 18px 0; }
+.hh-stripe-element { margin: 18px 0; border: 1.5px solid #ddd; border-radius: 8px; padding: 12px 14px; }
 
 /* processing */
 .hh-processing { text-align: center; padding-top: 50px; padding-bottom: 50px; }
