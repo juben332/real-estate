@@ -3,7 +3,7 @@ import Icon, { icons } from "../ui/Icon";
 import PhotoMark from "../ui/PhotoMark";
 import BookingCalendar from "../booking/BookingCalendar";
 import PaymentModal from "../payment/PaymentModal";
-import { CHANNELS } from "../../data/properties";
+import { CHANNELS } from "../../data/properties"; // channel colour legend only
 import { nightsBetween } from "../../utils/dateHelpers";
 
 export default function PropertyDetail({ property, propertyBookings, onAddBooking, onBack }) {
@@ -17,7 +17,10 @@ export default function PropertyDetail({ property, propertyBookings, onAddBookin
 
   const handleClose = (completed) => {
     setShowPay(false);
-    if (completed) setRange({ start: null, end: null });
+    if (completed) {
+      setRange({ start: null, end: null });
+      onAddBooking(); // re-fetch availability from Supabase
+    }
   };
 
   return (
@@ -128,7 +131,7 @@ export default function PropertyDetail({ property, propertyBookings, onAddBookin
           range={range}
           nights={nights}
           total={total}
-          onConfirm={() => onAddBooking(range)}
+          onConfirm={() => {}}
           onClose={handleClose}
         />
       )}

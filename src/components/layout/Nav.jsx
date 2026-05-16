@@ -8,7 +8,7 @@ const LINKS = [
   ["contact",    "Contact"],
 ];
 
-export default function Nav({ onNav, current }) {
+export default function Nav({ onNav, current, isAdmin }) {
   const { user, profile } = useAuth();
   const [open, setOpen] = useState(false);
 
@@ -40,7 +40,7 @@ export default function Nav({ onNav, current }) {
             className={`hh-link hh-link-cta ${current === "dashboard" ? "is-active" : ""}`}
             onClick={() => go("dashboard")}
           >
-            {profile?.role === "admin" ? "Admin" : profile?.name?.split(" ")[0] || "Dashboard"}
+            {isAdmin ? "Admin" : profile?.name?.split(" ")[0] || "Dashboard"}
           </button>
         ) : (
           <>

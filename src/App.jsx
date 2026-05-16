@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { supabase } from "./lib/supabase";
 import Nav from "./components/layout/Nav";
 import Footer from "./components/layout/Footer";
 import Hero from "./components/home/Hero";
@@ -14,54 +15,82 @@ import Register from "./pages/Register";
 import ClientDashboard from "./pages/ClientDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import PageHead from "./components/ui/PageHead";
-import { PROPERTIES } from "./data/properties";
-import { makeSeedBookings } from "./utils/seedBookings";
 
 function AppContent() {
-  const { user, profile, loading } = useAuth();
-  const [view,     setView]     = useState({ page: "home" });
-  const [bookings, setBookings] = useState(() => makeSeedBookings());
+  const { user, profile, loading: authLoading } = useAuth();
+  const [view,       setView]       = useState({ page: "home" });
+  const [properties, setProperties] = useState([]);
+  const [bookings,   setBookings]   = useState({});
+  const [propLoading, setPropLoading] = useState(true);
 
   const isAdmin = profile?.role === "admin" ||
     (user?.email && user.email === import.meta.env.VITE_ADMIN_EMAIL);
+
+  // Fetch active properties from Supabase
+  useEffect(() => {
+    supabase
+      .from("properties")
+      .select("*")
+      .eq("active", true)
+      .order("created_at")
+      .then(({ data }) => {
+        setProperties(data || []);
+        setPropLoading(false);
+      });
+  }, []);
+
+  // Fetch confirmed booking date ranges for all properties (for calendar blocking)
+  const fetchAvailability = useCallback(async () => {
+    const { data } = await supabase
+      .from("property_availability")
+      .select("property_id, range_start, range_end");
+
+    const grouped = {};
+    (data || []).forEach((b) => {
+      if (!grouped[b.property_id]) grouped[b.property_id] = [];
+      grouped[b.property_id].push({
+        start: b.range_start,
+        end:   b.range_end,
+        channel: "direct",
+      });
+    });
+    setBookings(grouped);
+  }, []);
+
+  useEffect(() => { fetchAvailability(); }, [fetchAvailability]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [view]);
 
-  const addBooking = (propId, range) => {
-    setBookings((prev) => ({
-      ...prev,
-      [propId]: [
-        ...(prev[propId] || []),
-        { start: range.start, end: range.end, channel: "direct" },
-      ],
-    }));
-  };
-
   const nav = (page) => {
     if (page === "dashboard" && !user) { setView({ page: "login" }); return; }
-    if (page === "admin" && !isAdmin) { setView({ page: "home" }); return; }
+    if (page === "admin" && !isAdmin)  { setView({ page: "home"  }); return; }
     setView({ page });
   };
 
   const open = (id) => setView({ page: "property", id });
 
   const active = view.page === "property"
-    ? PROPERTIES.find((p) => p.id === view.id)
+    ? properties.find((p) => p.id === view.id)
     : null;
 
-  if (loading) return null;
+  if (authLoading) return null;
 
   return (
     <div className="hh-root">
-      <Nav onNav={nav} current={view.page} />
+      <Nav onNav={nav} current={view.page} isAdmin={isAdmin} />
 
       {view.page === "home" && (
         <>
           <Hero onExplore={() => nav("properties")} />
           <Marquee />
-          <PropertyGrid onOpen={open} heading="Four places to land" />
+          <PropertyGrid
+            properties={properties}
+            loading={propLoading}
+            onOpen={open}
+            heading="Four places to land"
+          />
           <AboutStrip onMore={() => nav("about")} />
         </>
       )}
@@ -73,7 +102,11 @@ function AppContent() {
             title="Every door we keep"
             sub="Four small houses, each looked after like it's our own — because it is. Live availability, instant booking."
           />
-          <PropertyGrid onOpen={open} />
+          <PropertyGrid
+            properties={properties}
+            loading={propLoading}
+            onOpen={open}
+          />
         </section>
       )}
 
@@ -81,7 +114,7 @@ function AppContent() {
         <PropertyDetail
           property={active}
           propertyBookings={bookings[active.id] || []}
-          onAddBooking={(range) => addBooking(active.id, range)}
+          onAddBooking={fetchAvailability}
           onBack={() => nav("properties")}
         />
       )}
