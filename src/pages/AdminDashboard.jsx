@@ -451,6 +451,7 @@ function Users() {
               <tr>
                 <th>Name</th>
                 <th>Email</th>
+                <th>Phone</th>
                 <th>Role</th>
                 <th>Joined</th>
                 <th>Actions</th>
@@ -461,6 +462,7 @@ function Users() {
                 <tr key={u.id}>
                   <td><strong>{u.name || "—"}</strong></td>
                   <td>{u.email}</td>
+                  <td>{u.phone || <span style={{ color: "#aaa" }}>—</span>}</td>
                   <td>
                     <span className={`hh-status hh-status-${u.role === "admin" ? "confirmed" : "pending"}`}>
                       {u.role}

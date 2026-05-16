@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { prettyDate } from "../utils/dateHelpers";
 
+/* ─── Booking History ─── */
 function BookingHistory({ userId }) {
   const [bookings, setBookings] = useState([]);
   const [loading,  setLoading]  = useState(true);
@@ -26,7 +27,13 @@ function BookingHistory({ userId }) {
   };
 
   if (loading) return <p className="hh-dash-empty">Loading bookings…</p>;
-  if (!bookings.length) return <p className="hh-dash-empty">No bookings yet — explore a property to get started.</p>;
+  if (!bookings.length) return (
+    <div className="cd-empty-state">
+      <span className="cd-empty-icon">🏡</span>
+      <h3>No bookings yet</h3>
+      <p>Explore our properties and book your first stay.</p>
+    </div>
+  );
 
   return (
     <div className="hh-dash-table-wrap">
@@ -52,10 +59,8 @@ function BookingHistory({ userId }) {
               <td>{prettyDate(b.range_start)} → {prettyDate(b.range_end)}</td>
               <td>{b.nights}</td>
               <td>${b.total?.toLocaleString()}</td>
-              <td><code>{b.confirmation_code}</code></td>
-              <td>
-                <span className={`hh-status hh-status-${b.status}`}>{b.status}</span>
-              </td>
+              <td><code style={{ fontSize: "0.8rem" }}>{b.confirmation_code}</code></td>
+              <td><span className={`hh-status hh-status-${b.status}`}>{b.status}</span></td>
               <td>
                 {b.status === "confirmed" && (
                   <button className="hh-btn-ghost hh-btn-danger" onClick={() => cancel(b.id)}>
@@ -71,45 +76,110 @@ function BookingHistory({ userId }) {
   );
 }
 
+/* ─── Profile Editor ─── */
 function ProfileEditor() {
   const { user, profile, updateProfile } = useAuth();
-  const [name,   setName]   = useState(profile?.name || "");
+  const [form,   setForm]   = useState({ name: "", phone: "" });
   const [saving, setSaving] = useState(false);
-  const [saved,  setSaved]  = useState(false);
+  const [status, setStatus] = useState(""); // "" | "saved" | "error"
+  const [errMsg, setErrMsg] = useState("");
+
+  useEffect(() => {
+    setForm({
+      name:  profile?.name  || "",
+      phone: profile?.phone || "",
+    });
+  }, [profile]);
+
+  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
   const save = async (e) => {
     e.preventDefault();
     setSaving(true);
+    setStatus("");
     try {
-      await updateProfile({ name });
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      await updateProfile({ name: form.name.trim(), phone: form.phone.trim() });
+      setStatus("saved");
+      setTimeout(() => setStatus(""), 3000);
+    } catch (err) {
+      setErrMsg(err.message);
+      setStatus("error");
     } finally {
       setSaving(false);
     }
   };
 
+  const initials = form.name
+    ? form.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
+    : (user?.email?.[0] || "?").toUpperCase();
+
   return (
-    <form onSubmit={save} className="hh-profile-form">
-      <div className="hh-form-group">
-        <label>Full name</label>
-        <input
-          className="hh-form-input"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+    <div className="cd-profile-wrap">
+      {/* Avatar */}
+      <div className="cd-avatar-block">
+        <div className="cd-avatar">{initials}</div>
+        <div>
+          <h3 className="cd-avatar-name">{form.name || "Your Name"}</h3>
+          <p className="cd-avatar-email">{user?.email}</p>
+          <span className="hh-status hh-status-pending cd-role-badge">
+            {profile?.role || "client"}
+          </span>
+        </div>
       </div>
-      <div className="hh-form-group">
-        <label>Email</label>
-        <input className="hh-form-input" value={user?.email || ""} disabled />
-      </div>
-      <button type="submit" className="hh-btn hh-btn-solid" disabled={saving}>
-        {saved ? "Saved!" : saving ? "Saving…" : "Save changes"}
-      </button>
-    </form>
+
+      {/* Form */}
+      <form onSubmit={save} className="cd-profile-form">
+        <div className="cd-form-section-title">Personal Information</div>
+
+        <div className="cd-field-row">
+          <div className="hh-form-group">
+            <label>Full Name</label>
+            <input
+              className="hh-form-input"
+              value={form.name}
+              onChange={(e) => set("name", e.target.value)}
+              placeholder="e.g. Juan dela Cruz"
+            />
+          </div>
+          <div className="hh-form-group">
+            <label>Contact Number</label>
+            <input
+              className="hh-form-input"
+              type="tel"
+              value={form.phone}
+              onChange={(e) => set("phone", e.target.value)}
+              placeholder="e.g. +63 912 345 6789"
+            />
+          </div>
+        </div>
+
+        <div className="cd-form-section-title" style={{ marginTop: "1.5rem" }}>Account</div>
+
+        <div className="hh-form-group">
+          <label>Email Address</label>
+          <input
+            className="hh-form-input"
+            value={user?.email || ""}
+            disabled
+            style={{ background: "var(--bg-2)", color: "var(--ink-soft)", cursor: "not-allowed" }}
+          />
+          <span className="cd-field-note">Email cannot be changed.</span>
+        </div>
+
+        {status === "error" && <p className="hh-pay-error">{errMsg}</p>}
+
+        <div className="cd-form-actions">
+          {status === "saved" && <span className="cd-saved-msg">✓ Changes saved</span>}
+          <button type="submit" className="hh-btn hh-btn-solid" disabled={saving}>
+            {saving ? "Saving…" : "Save changes"}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
 
+/* ─── Main ─── */
 export default function ClientDashboard({ onNavigate }) {
   const { user, profile, signOut, refreshProfile } = useAuth();
   const [tab, setTab] = useState("bookings");
@@ -121,12 +191,14 @@ export default function ClientDashboard({ onNavigate }) {
     onNavigate("home");
   };
 
+  const firstName = profile?.name?.split(" ")[0] || user?.email?.split("@")[0] || "there";
+
   return (
     <div className="hh-dash-page">
       <div className="hh-dash-header">
         <div>
-          <p className="hh-kicker">My account</p>
-          <h1 className="hh-dash-title">Welcome, {profile?.name || user?.email}</h1>
+          <p className="hh-kicker">My Account</p>
+          <h1 className="hh-dash-title">Welcome back, {firstName}</h1>
         </div>
         <button className="hh-btn hh-btn-outline" onClick={handleSignOut}>Sign out</button>
       </div>

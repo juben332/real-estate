@@ -654,6 +654,92 @@
 .hh-grid-loading { padding: 3rem; text-align: center; color: var(--ink-soft); }
 
 /* ═══════════════════════════════════════════════════════════════
+   CLIENT PROFILE
+═══════════════════════════════════════════════════════════════ */
+.cd-profile-wrap {
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.cd-avatar-block {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.cd-avatar {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--cream);
+  display: grid; place-items: center;
+  font-family: 'Fraunces', serif;
+  font-size: 22px; font-weight: 600;
+  flex-shrink: 0;
+}
+.cd-avatar-name { font-size: 1.1rem; font-weight: 600; color: var(--ink); margin: 0 0 2px; }
+.cd-avatar-email { font-size: 0.85rem; color: var(--ink-soft); margin: 0 0 8px; }
+.cd-role-badge { font-size: 0.7rem; }
+
+.cd-profile-form {
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+.cd-form-section-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+.cd-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.cd-field-note {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  margin-top: 4px;
+  display: block;
+}
+.cd-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+.cd-saved-msg {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #2d7a3a;
+}
+.cd-empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--ink-soft);
+}
+.cd-empty-icon { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
+.cd-empty-state h3 { font-size: 1.25rem; color: var(--ink); margin-bottom: 0.5rem; }
+.cd-empty-state p { font-size: 0.9rem; }
+@media (max-width: 540px) {
+  .cd-field-row { grid-template-columns: 1fr; }
+  .cd-profile-form { padding: 1.25rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
    ADMIN PANEL
 ═══════════════════════════════════════════════════════════════ */
 .ap-shell {
