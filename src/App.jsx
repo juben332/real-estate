@@ -22,6 +22,9 @@ function AppContent() {
   const [view,     setView]     = useState({ page: "home" });
   const [bookings, setBookings] = useState(() => makeSeedBookings());
 
+  const isAdmin = profile?.role === "admin" ||
+    (user?.email && user.email === import.meta.env.VITE_ADMIN_EMAIL);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [view]);
@@ -38,7 +41,7 @@ function AppContent() {
 
   const nav = (page) => {
     if (page === "dashboard" && !user) { setView({ page: "login" }); return; }
-    if (page === "admin" && profile?.role !== "admin") { setView({ page: "home" }); return; }
+    if (page === "admin" && !isAdmin) { setView({ page: "home" }); return; }
     setView({ page });
   };
 
@@ -89,7 +92,7 @@ function AppContent() {
       {view.page === "register" && <Register onNavigate={nav} />}
 
       {view.page === "dashboard" && user && (
-        profile?.role === "admin"
+        isAdmin
           ? <AdminDashboard  onNavigate={nav} />
           : <ClientDashboard onNavigate={nav} />
       )}
