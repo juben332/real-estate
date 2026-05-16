@@ -10,8 +10,8 @@ function AllBookings() {
 
   const fetchBookings = async () => {
     const { data } = await supabase
-      .from("bookings")
-      .select("*, profiles(name), properties(name, location)")
+      .from("bookings_detail")
+      .select("*")
       .order("created_at", { ascending: false });
     setBookings(data || []);
     setLoading(false);
@@ -45,10 +45,13 @@ function AllBookings() {
         <tbody>
           {bookings.map((b) => (
             <tr key={b.id} className={b.status === "cancelled" ? "hh-row-cancelled" : ""}>
-              <td>{b.profiles?.name || "Guest"}</td>
               <td>
-                <strong>{b.properties?.name ?? b.property_id}</strong>
-                <span className="hh-table-sub">{b.properties?.location}</span>
+                <strong>{b.guest_name || "Guest"}</strong>
+                <span className="hh-table-sub">{b.guest_email}</span>
+              </td>
+              <td>
+                <strong>{b.property_name ?? b.property_id}</strong>
+                <span className="hh-table-sub">{b.property_location}</span>
               </td>
               <td>{prettyDate(b.range_start)} → {prettyDate(b.range_end)}</td>
               <td>{b.nights}</td>
