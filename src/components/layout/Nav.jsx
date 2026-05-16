@@ -1,40 +1,146 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown, Home, Building2, MapPin, CalendarDays, Info, Phone, Star, Waves, TreePine } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
-const LINKS = [
-  ["home",       "Home"],
-  ["properties", "Properties"],
-  ["about",      "About"],
-  ["contact",    "Contact"],
+const NAV_ITEMS = [
+  { id: 1, label: "Home", key: "home" },
+  {
+    id: 2,
+    label: "Properties",
+    subMenus: [
+      {
+        title: "Browse",
+        items: [
+          { label: "All Properties",     description: "View our full collection",   icon: Building2,   key: "properties" },
+          { label: "Beach & Coast",      description: "Oceanfront escapes",         icon: Waves,       key: "properties" },
+          { label: "Mountain Retreats",  description: "Peaceful highland stays",    icon: TreePine,    key: "properties" },
+        ],
+      },
+      {
+        title: "Plan Your Stay",
+        items: [
+          { label: "Check Availability", description: "See open dates",            icon: CalendarDays, key: "properties" },
+          { label: "Featured Stays",     description: "Our top-rated properties",  icon: Star,         key: "properties" },
+          { label: "Locations",          description: "Explore by destination",    icon: MapPin,       key: "properties" },
+        ],
+      },
+    ],
+  },
+  {
+    id: 3,
+    label: "About",
+    key: "about",
+    subMenus: [
+      {
+        title: "Company",
+        items: [
+          { label: "Our Story",    description: "How Hearth & Hollow began",    icon: Home,  key: "about"   },
+          { label: "How It Works", description: "Book your stay in 3 steps",    icon: Info,  key: "about"   },
+          { label: "Contact Us",   description: "We'd love to hear from you",   icon: Phone, key: "contact" },
+        ],
+      },
+    ],
+  },
+  { id: 4, label: "Contact", key: "contact" },
 ];
 
 export default function Nav({ onNav, current, isAdmin }) {
   const { user, profile } = useAuth();
-  const [open, setOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState(null);
+  const [hoverBtn, setHoverBtn] = useState(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  const go = (page) => {
-    onNav(page);
-    setOpen(false);
+  const go = (key) => {
+    onNav(key);
+    setOpenMenu(null);
+    setMobileOpen(false);
   };
 
   return (
     <header className="hh-nav">
+      {/* Logo */}
       <button className="hh-logo" onClick={() => go("home")}>
         <span className="hh-logo-mark">H<span>&</span>H</span>
         <span className="hh-logo-word">Hearth &amp; Hollow</span>
       </button>
 
-      <nav className={`hh-links ${open ? "is-open" : ""}`}>
-        {LINKS.map(([key, label]) => (
-          <button
-            key={key}
-            className={`hh-link ${current === key ? "is-active" : ""}`}
-            onClick={() => go(key)}
+      {/* Desktop nav */}
+      <nav className={`hh-links ${mobileOpen ? "is-open" : ""}`}>
+        {NAV_ITEMS.map((item) => (
+          <div
+            key={item.id}
+            className="hh-nav-item"
+            onMouseEnter={() => setOpenMenu(item.label)}
+            onMouseLeave={() => setOpenMenu(null)}
           >
-            {label}
-          </button>
+            <button
+              className={`hh-link hh-nav-btn ${current === item.key ? "is-active" : ""}`}
+              onClick={() => item.key && go(item.key)}
+              onMouseEnter={() => setHoverBtn(item.id)}
+              onMouseLeave={() => setHoverBtn(null)}
+            >
+              <span>{item.label}</span>
+              {item.subMenus && (
+                <ChevronDown
+                  size={14}
+                  className={`hh-nav-chevron ${openMenu === item.label ? "is-open" : ""}`}
+                />
+              )}
+              {(hoverBtn === item.id || openMenu === item.label) && (
+                <motion.span
+                  layoutId="nav-hover-bg"
+                  className="hh-nav-hover-bg"
+                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                />
+              )}
+            </button>
+
+            {/* Dropdown */}
+            <AnimatePresence>
+              {openMenu === item.label && item.subMenus && (
+                <motion.div
+                  className="hh-dropdown"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 8 }}
+                  transition={{ duration: 0.18, ease: "easeOut" }}
+                >
+                  <div className="hh-dropdown-inner">
+                    {item.subMenus.map((sub) => (
+                      <div key={sub.title} className="hh-dropdown-col">
+                        <p className="hh-dropdown-group-title">{sub.title}</p>
+                        <ul className="hh-dropdown-list">
+                          {sub.items.map((subItem) => {
+                            const Icon = subItem.icon;
+                            return (
+                              <li key={subItem.label}>
+                                <button
+                                  className="hh-dropdown-item"
+                                  onClick={() => go(subItem.key)}
+                                >
+                                  <span className="hh-dropdown-icon">
+                                    <Icon size={18} />
+                                  </span>
+                                  <span className="hh-dropdown-text">
+                                    <span className="hh-dropdown-label">{subItem.label}</span>
+                                    <span className="hh-dropdown-desc">{subItem.description}</span>
+                                  </span>
+                                </button>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         ))}
 
+        {/* Auth buttons */}
         {user ? (
           <button
             className={`hh-link hh-link-cta ${current === "dashboard" ? "is-active" : ""}`}
@@ -54,7 +160,12 @@ export default function Nav({ onNav, current, isAdmin }) {
         )}
       </nav>
 
-      <button className="hh-burger" onClick={() => setOpen((o) => !o)} aria-label="Menu">
+      {/* Burger */}
+      <button
+        className="hh-burger"
+        onClick={() => setMobileOpen((o) => !o)}
+        aria-label="Menu"
+      >
         <span /><span /><span />
       </button>
     </header>
