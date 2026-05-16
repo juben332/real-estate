@@ -275,7 +275,7 @@ function UsersManager() {
 
   useEffect(() => {
     supabase
-      .from("profiles")
+      .from("user_profiles")
       .select("*")
       .order("created_at", { ascending: false })
       .then(({ data }) => { setUsers(data || []); setLoading(false); });
@@ -295,6 +295,7 @@ function UsersManager() {
         <thead>
           <tr>
             <th>Name</th>
+            <th>Email</th>
             <th>Role</th>
             <th>Joined</th>
             <th>Actions</th>
@@ -304,6 +305,7 @@ function UsersManager() {
           {users.map((u) => (
             <tr key={u.id}>
               <td><strong>{u.name || "—"}</strong></td>
+              <td>{u.email}</td>
               <td>
                 <span className={`hh-status hh-status-${u.role === "admin" ? "confirmed" : "pending"}`}>
                   {u.role}
