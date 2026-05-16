@@ -32,9 +32,9 @@
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--line);
 }
-.hh-nav-left  { display: flex; align-items: center; gap: 4px; }
-.hh-nav-center { justify-self: center; }
-.hh-nav-right { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+.hh-nav-left-logo { justify-self: start; }
+.hh-nav-center { display: flex; align-items: center; gap: 4px; justify-self: center; }
+.hh-nav-right  { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
 
 .hh-logo { display: flex; align-items: center; gap: 10px; background: none; border: none; cursor: pointer; }
 .hh-logo-img { width: 38px; height: 38px; object-fit: contain; flex-shrink: 0; }
@@ -525,9 +525,9 @@
 }
 @media (max-width: 760px) {
   .hh-nav { grid-template-columns: auto 1fr auto; }
-  .hh-nav-left  { display: none; }
-  .hh-nav-right { display: none; }
-  .hh-nav-center { justify-self: start; grid-column: 1; }
+  .hh-nav-center { display: none; }
+  .hh-nav-right  { display: none; }
+  .hh-nav-left-logo { justify-self: start; grid-column: 1; }
   .hh-burger { display: flex; grid-column: 3; }
   .hh-mobile-drawer { display: flex; }
   .hh-link { text-align: left; padding: 12px 14px; }

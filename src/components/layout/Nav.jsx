@@ -127,16 +127,16 @@ export default function Nav({ onNav, current, isAdmin }) {
   return (
     <header className="hh-nav">
 
-      {/* ── Left: nav links ── */}
-      <nav className="hh-nav-left">
-        <NavLinks />
-      </nav>
-
-      {/* ── Center: logo ── */}
-      <button className="hh-logo hh-nav-center" onClick={() => go("home")}>
+      {/* ── Left: logo ── */}
+      <button className="hh-logo hh-nav-left-logo" onClick={() => go("home")}>
         <img src="/logo.svg" alt="Homely" className="hh-logo-img" />
         <span className="hh-logo-word">Homely</span>
       </button>
+
+      {/* ── Center: nav links ── */}
+      <nav className="hh-nav-center">
+        <NavLinks />
+      </nav>
 
       {/* ── Right: auth ── */}
       <div className="hh-nav-right">
