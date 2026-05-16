@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { prettyDate } from "../utils/dateHelpers";
 import Icon, { icons } from "../components/ui/Icon";
+import { cancelBooking } from "../utils/cancelBooking";
 
 /* ─────────────────── OVERVIEW ─────────────────── */
 function Overview({ onNav }) {
@@ -98,11 +99,13 @@ function Overview({ onNav }) {
 
 /* ─────────────────── BOOKINGS ─────────────────── */
 function Bookings() {
-  const [bookings, setBookings] = useState([]);
-  const [loading,  setLoading]  = useState(true);
-  const [filter,   setFilter]   = useState("all");
+  const [bookings,   setBookings]   = useState([]);
+  const [loading,    setLoading]    = useState(true);
+  const [filter,     setFilter]     = useState("all");
+  const [cancelling, setCancelling] = useState(null);
+  const [actionMsg,  setActionMsg]  = useState("");
 
-  const fetch = useCallback(async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     const q = supabase.from("bookings_detail").select("*").order("created_at", { ascending: false });
     if (filter !== "all") q.eq("status", filter);
@@ -111,11 +114,41 @@ function Bookings() {
     setLoading(false);
   }, [filter]);
 
-  useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => { load(); }, [load]);
 
   const setStatus = async (id, status) => {
     await supabase.from("bookings").update({ status }).eq("id", id);
-    fetch();
+    load();
+  };
+
+  const handleCancel = async (b, withRefund) => {
+    const msg = withRefund
+      ? `Cancel and refund $${Number(b.total).toLocaleString()} to ${b.guest_email}?`
+      : `Cancel WITHOUT refund? The guest will not get their money back.`;
+    if (!confirm(msg)) return;
+    setCancelling(b.id);
+    setActionMsg("");
+
+    if (withRefund) {
+      const result = await cancelBooking({
+        bookingId:       b.id,
+        paymentIntentId: b.stripe_payment_intent_id,
+      });
+      setCancelling(null);
+      if (!result.success) {
+        setActionMsg(`Error: ${result.error}`);
+      } else {
+        setActionMsg(result.refunded
+          ? `Refund of $${result.amount.toLocaleString()} issued to ${b.guest_email}.`
+          : `Booking cancelled (no payment to refund).`);
+        load();
+      }
+    } else {
+      await supabase.from("bookings").update({ status: "cancelled" }).eq("id", b.id);
+      setCancelling(null);
+      setActionMsg(`Booking cancelled. No refund issued.`);
+      load();
+    }
   };
 
   const FILTERS = ["all", "confirmed", "cancelled", "completed"];
@@ -136,6 +169,13 @@ function Bookings() {
           ))}
         </div>
       </div>
+
+      {actionMsg && (
+        <div className={`cd-cancel-msg ${actionMsg.startsWith("Error") ? "is-error" : "is-success"}`}
+          style={{ marginBottom: "1rem" }}>
+          {actionMsg}
+        </div>
+      )}
 
       {loading ? (
         <p className="ap-empty">Loading…</p>
@@ -169,18 +209,42 @@ function Bookings() {
                   </td>
                   <td>{prettyDate(b.range_start)} → {prettyDate(b.range_end)}</td>
                   <td>{b.nights}</td>
-                  <td>${Number(b.total).toLocaleString()}</td>
+                  <td>
+                    ${Number(b.total).toLocaleString()}
+                    {b.refund_id && <span className="cd-refunded-badge">Refunded</span>}
+                  </td>
                   <td><code style={{ fontSize: "0.8rem" }}>{b.confirmation_code}</code></td>
                   <td><span className={`hh-status hh-status-${b.status}`}>{b.status}</span></td>
                   <td className="hh-table-actions">
                     {b.status === "confirmed" && (
                       <>
-                        <button className="hh-btn-ghost hh-btn-danger" onClick={() => setStatus(b.id, "cancelled")}>Cancel</button>
-                        <button className="hh-btn-ghost" onClick={() => setStatus(b.id, "completed")}>Complete</button>
+                        {b.stripe_payment_intent_id && !b.refund_id && (
+                          <button
+                            className="hh-btn-ghost hh-btn-danger"
+                            disabled={cancelling === b.id}
+                            onClick={() => handleCancel(b, true)}
+                            title="Cancel and refund guest"
+                          >
+                            {cancelling === b.id ? "…" : "Cancel + Refund"}
+                          </button>
+                        )}
+                        <button
+                          className="hh-btn-ghost hh-btn-danger"
+                          disabled={cancelling === b.id}
+                          onClick={() => handleCancel(b, false)}
+                          title="Cancel without refund"
+                        >
+                          Cancel only
+                        </button>
+                        <button className="hh-btn-ghost" onClick={() => setStatus(b.id, "completed")}>
+                          Complete
+                        </button>
                       </>
                     )}
                     {b.status === "cancelled" && (
-                      <button className="hh-btn-ghost" onClick={() => setStatus(b.id, "confirmed")}>Restore</button>
+                      <button className="hh-btn-ghost" onClick={() => setStatus(b.id, "confirmed")}>
+                        Restore
+                      </button>
                     )}
                   </td>
                 </tr>

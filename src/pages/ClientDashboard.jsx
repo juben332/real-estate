@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { prettyDate } from "../utils/dateHelpers";
+import { cancelBooking } from "../utils/cancelBooking";
 
 /* ─── Booking History ─── */
 function BookingHistory({ userId }) {
-  const [bookings, setBookings] = useState([]);
-  const [loading,  setLoading]  = useState(true);
+  const [bookings,    setBookings]    = useState([]);
+  const [loading,     setLoading]     = useState(true);
+  const [cancelling,  setCancelling]  = useState(null); // bookingId being cancelled
+  const [cancelMsg,   setCancelMsg]   = useState("");
 
   const fetchBookings = async () => {
     const { data } = await supabase
@@ -20,10 +23,23 @@ function BookingHistory({ userId }) {
 
   useEffect(() => { fetchBookings(); }, [userId]);
 
-  const cancel = async (id) => {
-    if (!confirm("Cancel this booking? This cannot be undone.")) return;
-    await supabase.from("bookings").update({ status: "cancelled" }).eq("id", id);
-    fetchBookings();
+  const cancel = async (booking) => {
+    if (!confirm(`Cancel this booking? ${booking.stripe_payment_intent_id ? "A full refund will be issued to your card." : "No payment to refund."}`)) return;
+    setCancelling(booking.id);
+    setCancelMsg("");
+    const result = await cancelBooking({
+      bookingId:        booking.id,
+      paymentIntentId:  booking.stripe_payment_intent_id,
+    });
+    setCancelling(null);
+    if (!result.success) {
+      setCancelMsg(`Error: ${result.error}`);
+    } else {
+      setCancelMsg(result.refunded
+        ? `Booking cancelled. $${result.amount.toLocaleString()} refund is on its way to your card (5–10 business days).`
+        : "Booking cancelled.");
+      fetchBookings();
+    }
   };
 
   if (loading) return <p className="hh-dash-empty">Loading bookings…</p>;
@@ -36,42 +52,58 @@ function BookingHistory({ userId }) {
   );
 
   return (
-    <div className="hh-dash-table-wrap">
-      <table className="hh-dash-table">
-        <thead>
-          <tr>
-            <th>Property</th>
-            <th>Dates</th>
-            <th>Nights</th>
-            <th>Total</th>
-            <th>Code</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {bookings.map((b) => (
-            <tr key={b.id} className={b.status === "cancelled" ? "hh-row-cancelled" : ""}>
-              <td>
-                <strong>{b.properties?.name ?? b.property_id}</strong>
-                <span className="hh-table-sub">{b.properties?.location}</span>
-              </td>
-              <td>{prettyDate(b.range_start)} → {prettyDate(b.range_end)}</td>
-              <td>{b.nights}</td>
-              <td>${b.total?.toLocaleString()}</td>
-              <td><code style={{ fontSize: "0.8rem" }}>{b.confirmation_code}</code></td>
-              <td><span className={`hh-status hh-status-${b.status}`}>{b.status}</span></td>
-              <td>
-                {b.status === "confirmed" && (
-                  <button className="hh-btn-ghost hh-btn-danger" onClick={() => cancel(b.id)}>
-                    Cancel
-                  </button>
-                )}
-              </td>
+    <div>
+      {cancelMsg && (
+        <div className={`cd-cancel-msg ${cancelMsg.startsWith("Error") ? "is-error" : "is-success"}`}>
+          {cancelMsg}
+        </div>
+      )}
+      <div className="hh-dash-table-wrap">
+        <table className="hh-dash-table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Dates</th>
+              <th>Nights</th>
+              <th>Total</th>
+              <th>Code</th>
+              <th>Status</th>
+              <th></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {bookings.map((b) => (
+              <tr key={b.id} className={b.status === "cancelled" ? "hh-row-cancelled" : ""}>
+                <td>
+                  <strong>{b.properties?.name ?? b.property_id}</strong>
+                  <span className="hh-table-sub">{b.properties?.location}</span>
+                </td>
+                <td>{prettyDate(b.range_start)} → {prettyDate(b.range_end)}</td>
+                <td>{b.nights}</td>
+                <td>
+                  ${b.total?.toLocaleString()}
+                  {b.refund_id && (
+                    <span className="cd-refunded-badge">Refunded</span>
+                  )}
+                </td>
+                <td><code style={{ fontSize: "0.8rem" }}>{b.confirmation_code}</code></td>
+                <td><span className={`hh-status hh-status-${b.status}`}>{b.status}</span></td>
+                <td>
+                  {b.status === "confirmed" && (
+                    <button
+                      className="hh-btn-ghost hh-btn-danger"
+                      disabled={cancelling === b.id}
+                      onClick={() => cancel(b)}
+                    >
+                      {cancelling === b.id ? "Cancelling…" : "Cancel"}
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

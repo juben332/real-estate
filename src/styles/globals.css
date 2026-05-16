@@ -726,6 +726,28 @@
   font-weight: 600;
   color: #2d7a3a;
 }
+.cd-refunded-badge {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #d4e8f0;
+  color: #1a4b6b;
+  padding: 2px 7px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+.cd-cancel-msg {
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+.cd-cancel-msg.is-success { background: #d4f0d4; color: #1a5c1a; }
+.cd-cancel-msg.is-error   { background: #f0d4d4; color: #6b1a1a; }
 .cd-empty-state {
   text-align: center;
   padding: 3rem 1rem;
