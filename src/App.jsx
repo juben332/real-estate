@@ -77,6 +77,11 @@ function AppContent() {
 
   if (authLoading) return null;
 
+  // Admin dashboard takes over the full screen — no site nav/footer
+  if (view.page === "dashboard" && user && isAdmin) {
+    return <AdminDashboard onNavigate={nav} />;
+  }
+
   return (
     <div className="hh-root">
       <Nav onNav={nav} current={view.page} isAdmin={isAdmin} />
@@ -124,10 +129,8 @@ function AppContent() {
       {view.page === "login"    && <Login    onNavigate={nav} />}
       {view.page === "register" && <Register onNavigate={nav} />}
 
-      {view.page === "dashboard" && user && (
-        isAdmin
-          ? <AdminDashboard  onNavigate={nav} />
-          : <ClientDashboard onNavigate={nav} />
+      {view.page === "dashboard" && user && !isAdmin && (
+        <ClientDashboard onNavigate={nav} />
       )}
 
       <Footer onNav={nav} />
