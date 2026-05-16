@@ -5,12 +5,15 @@ import Icon, { icons } from "../ui/Icon";
 import PhotoMark from "../ui/PhotoMark";
 import ChannelSync from "../booking/ChannelSync";
 import { prettyDate } from "../../utils/dateHelpers";
+import { useAuth } from "../../context/AuthContext";
+import { supabase } from "../../lib/supabase";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 function CheckoutForm({ property, range, nights, total, onConfirm, onClose }) {
   const stripe   = useStripe();
   const elements = useElements();
+  const { user } = useAuth();
   const [step, setStep]     = useState("details");
   const [errMsg, setErrMsg] = useState("");
   const [ready, setReady]   = useState(false);
@@ -20,8 +23,6 @@ function CheckoutForm({ property, range, nights, total, onConfirm, onClose }) {
 
   const pay = async () => {
     if (!stripe || !elements) return;
-    // Don't unmount the PaymentElement before confirmPayment runs —
-    // show processing overlay instead, keeping the element in the DOM
     setStep("processing");
     setErrMsg("");
     try {
@@ -34,6 +35,19 @@ function CheckoutForm({ property, range, nights, total, onConfirm, onClose }) {
         setErrMsg(error.message);
         setStep("details");
       } else if (paymentIntent && paymentIntent.status === "succeeded") {
+        if (user) {
+          await supabase.from("bookings").insert({
+            user_id:                  user.id,
+            property_id:              property.id,
+            range_start:              range.start,
+            range_end:                range.end,
+            nights,
+            total,
+            confirmation_code:        code,
+            stripe_payment_intent_id: paymentIntent.id,
+            status:                   "confirmed",
+          });
+        }
         onConfirm();
         setStep("done");
       }
@@ -45,14 +59,13 @@ function CheckoutForm({ property, range, nights, total, onConfirm, onClose }) {
 
   return (
     <>
-      {/* Close button — hidden while processing */}
       {step !== "processing" && (
         <button className="hh-modal-x" onClick={() => onClose(step === "done")} aria-label="Close">
           <Icon d={icons.close} size={18} />
         </button>
       )}
 
-      {/* ── Details — always stays in the DOM so PaymentElement never unmounts ── */}
+      {/* Always in DOM so PaymentElement never unmounts before confirmPayment */}
       <div style={{ display: step === "details" ? "block" : "none" }}>
         <div className="hh-modal-body">
           <p className="hh-kicker">Secure payment via Stripe</p>
@@ -93,7 +106,6 @@ function CheckoutForm({ property, range, nights, total, onConfirm, onClose }) {
         </div>
       </div>
 
-      {/* ── Processing overlay ── */}
       {step === "processing" && (
         <div className="hh-modal-body hh-processing">
           <span className="hh-spinner" />
@@ -102,12 +114,11 @@ function CheckoutForm({ property, range, nights, total, onConfirm, onClose }) {
         </div>
       )}
 
-      {/* ── Confirmed ── */}
       {step === "done" && (
         <div className="hh-modal-body hh-confirmed">
           <span className="hh-confirmed-mark"><Icon d={icons.check} size={30} /></span>
           <h2 className="hh-modal-title">Booking confirmed</h2>
-          <p className="hh-confirmed-sub">You're all set! A receipt and check-in details are on their way.</p>
+          <p className="hh-confirmed-sub">You&apos;re all set! A receipt and check-in details are on their way.</p>
           <div className="hh-confirmed-card">
             <div className="hh-confirmed-row"><span>Property</span><strong>{property.name}</strong></div>
             <div className="hh-confirmed-row">
@@ -175,11 +186,7 @@ export default function PaymentModal({ property, range, nights, total, onConfirm
             <p>Preparing secure checkout…</p>
           </div>
         ) : (
-          <Elements
-            key={clientSecret}
-            stripe={stripePromise}
-            options={{ clientSecret }}
-          >
+          <Elements key={clientSecret} stripe={stripePromise} options={{ clientSecret }}>
             <CheckoutForm
               property={property}
               range={range}

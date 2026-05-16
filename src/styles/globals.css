@@ -465,3 +465,189 @@
   .hh-pay-summary { flex-wrap: wrap; }
   .hh-pay-sum-total { margin-left: 0; text-align: left; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════════════════════════ */
+.hh-auth-page {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+  background: var(--bg);
+}
+.hh-auth-card {
+  background: #fff;
+  border-radius: 1.25rem;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 4px 32px rgba(0,0,0,.08);
+}
+.hh-auth-title {
+  font-family: var(--serif);
+  font-size: 2rem;
+  font-weight: 600;
+  margin: .25rem 0 1.75rem;
+  color: var(--ink);
+}
+.hh-auth-form { display: flex; flex-direction: column; gap: 1.25rem; }
+.hh-auth-switch { margin-top: 1.5rem; text-align: center; font-size: .875rem; color: var(--ink-soft); }
+.hh-auth-link {
+  background: none; border: none;
+  color: var(--accent, #C4622D);
+  cursor: pointer; font-weight: 600; padding: 0;
+  text-decoration: underline; font-size: inherit;
+}
+
+/* ── Form inputs ── */
+.hh-form-group { display: flex; flex-direction: column; gap: .375rem; }
+.hh-form-group label {
+  font-size: .75rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: var(--ink-soft);
+}
+.hh-form-input {
+  border: 1.5px solid var(--line);
+  border-radius: .625rem;
+  padding: .75rem 1rem;
+  font-size: 1rem; font-family: inherit;
+  background: #fff; color: var(--ink);
+  transition: border-color .15s; outline: none;
+  width: 100%; box-sizing: border-box;
+}
+.hh-form-input:focus { border-color: var(--ink); }
+.hh-form-textarea { resize: vertical; min-height: 5rem; }
+.hh-form-group-full { grid-column: 1 / -1; }
+.hh-color-input { height: 2.75rem; padding: .25rem; cursor: pointer; }
+
+/* ── Nav sign-in ── */
+.hh-link-signin {
+  background: none; border: 1.5px solid var(--ink);
+  color: var(--ink); border-radius: 999px;
+  padding: 6px 16px; font-size: .875rem; font-weight: 600;
+  cursor: pointer; transition: background .15s;
+  margin-left: .5rem;
+}
+.hh-link-signin:hover { background: rgba(33,28,21,.06); }
+
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════════════════════════ */
+.hh-dash-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 5rem;
+  min-height: 75vh;
+}
+.hh-dash-header {
+  display: flex; align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--line);
+  gap: 1rem;
+}
+.hh-dash-title {
+  font-family: var(--serif);
+  font-size: 1.75rem; font-weight: 600;
+  color: var(--ink); margin: .25rem 0 0;
+}
+.hh-dash-header-actions { display: flex; gap: .75rem; flex-shrink: 0; }
+.hh-dash-tabs {
+  display: flex; gap: .25rem;
+  border-bottom: 1.5px solid var(--line);
+  margin-bottom: 2rem;
+}
+.hh-dash-tabs button {
+  background: none; border: none;
+  padding: .75rem 1.25rem;
+  font-size: .9375rem; font-weight: 500;
+  color: var(--ink-soft); cursor: pointer;
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -1.5px;
+  transition: color .15s;
+  font-family: var(--sans);
+}
+.hh-dash-tabs button.active {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+  font-weight: 700;
+}
+.hh-dash-body { }
+.hh-dash-empty { padding: 3rem; text-align: center; color: var(--ink-soft); }
+.hh-dash-section-header {
+  display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 1.25rem;
+}
+.hh-dash-section-title {
+  font-size: 1.125rem; font-weight: 700; color: var(--ink);
+}
+
+/* ── Table ── */
+.hh-dash-table-wrap {
+  overflow-x: auto;
+  border-radius: .875rem;
+  border: 1px solid var(--line);
+}
+.hh-dash-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.hh-dash-table th {
+  text-align: left; padding: .75rem 1rem;
+  font-size: .72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-2); white-space: nowrap;
+}
+.hh-dash-table td {
+  padding: .875rem 1rem;
+  border-bottom: 1px solid #f0ede8;
+  color: var(--ink); vertical-align: middle;
+}
+.hh-dash-table tr:last-child td { border-bottom: none; }
+.hh-table-sub { display: block; font-size: .8rem; color: var(--ink-soft); margin-top: .15rem; }
+.hh-table-actions { display: flex; gap: .5rem; align-items: center; }
+.hh-row-cancelled td { opacity: .45; }
+
+/* ── Status badges ── */
+.hh-status {
+  display: inline-block; padding: .25rem .625rem;
+  border-radius: 999px; font-size: .72rem;
+  font-weight: 700; text-transform: uppercase;
+  letter-spacing: .05em; border: none; cursor: default;
+}
+.hh-status-confirmed { background: #d4f0d4; color: #1a6b1a; }
+.hh-status-cancelled { background: #f0d4d4; color: #6b1a1a; }
+.hh-status-completed { background: #d4e8f0; color: #1a4b6b; }
+.hh-status-pending   { background: #f0ead4; color: #6b4a1a; }
+
+/* ── Ghost / outline buttons ── */
+.hh-btn-ghost {
+  background: none; border: none;
+  padding: .375rem .75rem;
+  font-size: .875rem; font-weight: 600;
+  color: var(--ink); cursor: pointer;
+  border-radius: .5rem; transition: background .15s;
+  font-family: var(--sans);
+}
+.hh-btn-ghost:hover { background: var(--bg-2); }
+.hh-btn-ghost.hh-btn-danger { color: #b91c1c; }
+.hh-btn-ghost.hh-btn-danger:hover { background: #fde8e8; }
+.hh-btn-outline {
+  background: none; border: 1.5px solid var(--ink);
+  color: var(--ink); padding: .5rem 1.25rem;
+  border-radius: 999px; font-size: .875rem;
+  font-weight: 600; cursor: pointer;
+  transition: background .15s; font-family: var(--sans);
+}
+.hh-btn-outline:hover { background: rgba(33,28,21,.06); }
+
+/* ── Profile / Properties forms ── */
+.hh-profile-form { max-width: 480px; display: flex; flex-direction: column; gap: 1.25rem; }
+.hh-prop-form { max-width: 720px; }
+.hh-prop-form-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1rem; margin-bottom: 1.5rem;
+}
+.hh-prop-form-actions { display: flex; gap: .75rem; }

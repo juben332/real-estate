@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 
 const LINKS = [
   ["home",       "Home"],
@@ -8,6 +9,7 @@ const LINKS = [
 ];
 
 export default function Nav({ onNav, current }) {
+  const { user, profile } = useAuth();
   const [open, setOpen] = useState(false);
 
   const go = (page) => {
@@ -32,9 +34,24 @@ export default function Nav({ onNav, current }) {
             {label}
           </button>
         ))}
-        <button className="hh-link hh-link-cta" onClick={() => go("properties")}>
-          Book a stay
-        </button>
+
+        {user ? (
+          <button
+            className={`hh-link hh-link-cta ${current === "dashboard" ? "is-active" : ""}`}
+            onClick={() => go("dashboard")}
+          >
+            {profile?.role === "admin" ? "Admin" : profile?.name?.split(" ")[0] || "Dashboard"}
+          </button>
+        ) : (
+          <>
+            <button className="hh-link hh-link-cta" onClick={() => go("properties")}>
+              Book a stay
+            </button>
+            <button className="hh-link hh-link-signin" onClick={() => go("login")}>
+              Sign in
+            </button>
+          </>
+        )}
       </nav>
 
       <button className="hh-burger" onClick={() => setOpen((o) => !o)} aria-label="Menu">

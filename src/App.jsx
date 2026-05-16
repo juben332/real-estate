@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import Nav from "./components/layout/Nav";
 import Footer from "./components/layout/Footer";
 import Hero from "./components/home/Hero";
@@ -8,11 +9,16 @@ import PropertyGrid from "./components/properties/PropertyGrid";
 import PropertyDetail from "./components/properties/PropertyDetail";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ClientDashboard from "./pages/ClientDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import PageHead from "./components/ui/PageHead";
 import { PROPERTIES } from "./data/properties";
 import { makeSeedBookings } from "./utils/seedBookings";
 
-export default function App() {
+function AppContent() {
+  const { user, profile, loading } = useAuth();
   const [view,     setView]     = useState({ page: "home" });
   const [bookings, setBookings] = useState(() => makeSeedBookings());
 
@@ -30,12 +36,19 @@ export default function App() {
     }));
   };
 
-  const nav  = (page) => setView({ page });
-  const open = (id)   => setView({ page: "property", id });
+  const nav = (page) => {
+    if (page === "dashboard" && !user) { setView({ page: "login" }); return; }
+    if (page === "admin" && profile?.role !== "admin") { setView({ page: "home" }); return; }
+    setView({ page });
+  };
+
+  const open = (id) => setView({ page: "property", id });
 
   const active = view.page === "property"
     ? PROPERTIES.find((p) => p.id === view.id)
     : null;
+
+  if (loading) return null;
 
   return (
     <div className="hh-root">
@@ -70,10 +83,26 @@ export default function App() {
         />
       )}
 
-      {view.page === "about"   && <About />}
-      {view.page === "contact" && <Contact />}
+      {view.page === "about"    && <About />}
+      {view.page === "contact"  && <Contact />}
+      {view.page === "login"    && <Login    onNavigate={nav} />}
+      {view.page === "register" && <Register onNavigate={nav} />}
+
+      {view.page === "dashboard" && user && (
+        profile?.role === "admin"
+          ? <AdminDashboard  onNavigate={nav} />
+          : <ClientDashboard onNavigate={nav} />
+      )}
 
       <Footer onNav={nav} />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
