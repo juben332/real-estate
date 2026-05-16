@@ -2,14 +2,106 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { prettyDate } from "../utils/dateHelpers";
-import { cancelBooking } from "../utils/cancelBooking";
+import { requestCancellation } from "../utils/cancelBooking";
+
+/* ─── Cancellation Request Modal ─── */
+function CancelRequestModal({ booking, onClose, onSubmitted }) {
+  const [reason,     setReason]     = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error,      setError]      = useState("");
+
+  const hoursUntilCheckIn = (new Date(booking.range_start) - new Date()) / 36e5;
+  const withinWindow      = hoursUntilCheckIn <= 48;
+  const refundAmt         = (Number(booking.total) * 0.80).toFixed(2);
+  const feeAmt            = (Number(booking.total) * 0.20).toFixed(2);
+
+  const submit = async () => {
+    setSubmitting(true);
+    setError("");
+    const result = await requestCancellation({
+      bookingId:  booking.id,
+      rangeStart: booking.range_start,
+      reason,
+    });
+    setSubmitting(false);
+    if (!result.success) {
+      setError(result.error);
+    } else {
+      onSubmitted();
+    }
+  };
+
+  return (
+    <div className="hh-modal-overlay" onClick={onClose}>
+      <div className="hh-modal" style={{ maxWidth: 440 }} onClick={(e) => e.stopPropagation()}>
+        <div className="hh-modal-body">
+          <h2 className="hh-modal-title">Request Cancellation</h2>
+
+          <div className="cd-cancel-policy-box">
+            <p className="cd-cancel-policy-title">Cancellation Policy</p>
+            <div className="cd-cancel-policy-row">
+              <span>You receive (80%)</span>
+              <strong className="cd-policy-green">${Number(refundAmt).toLocaleString()}</strong>
+            </div>
+            <div className="cd-cancel-policy-row">
+              <span>Cancellation fee (20%)</span>
+              <strong className="cd-policy-red">${Number(feeAmt).toLocaleString()}</strong>
+            </div>
+            <div className="cd-cancel-policy-row cd-cancel-policy-total">
+              <span>Booking total</span>
+              <strong>${Number(booking.total).toLocaleString()}</strong>
+            </div>
+          </div>
+
+          {withinWindow ? (
+            <div className="cd-cancel-msg is-error" style={{ marginBottom: 0 }}>
+              Cancellations are not allowed within 48 hours of check-in
+              ({booking.range_start}). Please contact us directly.
+            </div>
+          ) : (
+            <>
+              <div className="hh-form-group" style={{ marginBottom: "1.25rem" }}>
+                <label>Reason (optional)</label>
+                <textarea
+                  className="hh-form-input hh-form-textarea"
+                  rows={3}
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder="Let us know why you're cancelling…"
+                />
+              </div>
+              {error && <p className="hh-pay-error">{error}</p>}
+              <p className="hh-pay-fineprint" style={{ marginBottom: "1rem" }}>
+                Your request will be reviewed by our team. Once approved, ${Number(refundAmt).toLocaleString()} will
+                be returned to your card within 5–10 business days.
+              </p>
+              <div style={{ display: "flex", gap: "0.75rem" }}>
+                <button className="hh-btn hh-btn-outline" style={{ flex: 1 }} onClick={onClose}>
+                  Keep booking
+                </button>
+                <button
+                  className="hh-btn hh-btn-solid"
+                  style={{ flex: 1, background: "#b91c1c" }}
+                  disabled={submitting}
+                  onClick={submit}
+                >
+                  {submitting ? "Submitting…" : "Submit request"}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /* ─── Booking History ─── */
 function BookingHistory({ userId }) {
-  const [bookings,    setBookings]    = useState([]);
-  const [loading,     setLoading]     = useState(true);
-  const [cancelling,  setCancelling]  = useState(null); // bookingId being cancelled
-  const [cancelMsg,   setCancelMsg]   = useState("");
+  const [bookings,       setBookings]       = useState([]);
+  const [loading,        setLoading]        = useState(true);
+  const [requestingFor,  setRequestingFor]  = useState(null);
+  const [toast,          setToast]          = useState("");
 
   const fetchBookings = async () => {
     const { data } = await supabase
@@ -23,23 +115,10 @@ function BookingHistory({ userId }) {
 
   useEffect(() => { fetchBookings(); }, [userId]);
 
-  const cancel = async (booking) => {
-    if (!confirm(`Cancel this booking? ${booking.stripe_payment_intent_id ? "A full refund will be issued to your card." : "No payment to refund."}`)) return;
-    setCancelling(booking.id);
-    setCancelMsg("");
-    const result = await cancelBooking({
-      bookingId:        booking.id,
-      paymentIntentId:  booking.stripe_payment_intent_id,
-    });
-    setCancelling(null);
-    if (!result.success) {
-      setCancelMsg(`Error: ${result.error}`);
-    } else {
-      setCancelMsg(result.refunded
-        ? `Booking cancelled. $${result.amount.toLocaleString()} refund is on its way to your card (5–10 business days).`
-        : "Booking cancelled.");
-      fetchBookings();
-    }
+  const onSubmitted = () => {
+    setRequestingFor(null);
+    setToast("Cancellation request submitted. We'll review it and get back to you.");
+    fetchBookings();
   };
 
   if (loading) return <p className="hh-dash-empty">Loading bookings…</p>;
@@ -51,11 +130,20 @@ function BookingHistory({ userId }) {
     </div>
   );
 
+  const statusLabel = (b) => {
+    if (b.status === "pending_cancellation") return "Pending review";
+    return b.status;
+  };
+  const statusClass = (b) => {
+    if (b.status === "pending_cancellation") return "hh-status hh-status-pending";
+    return `hh-status hh-status-${b.status}`;
+  };
+
   return (
     <div>
-      {cancelMsg && (
-        <div className={`cd-cancel-msg ${cancelMsg.startsWith("Error") ? "is-error" : "is-success"}`}>
-          {cancelMsg}
+      {toast && (
+        <div className="cd-cancel-msg is-success" style={{ marginBottom: "1rem" }}>
+          {toast}
         </div>
       )}
       <div className="hh-dash-table-wrap">
@@ -82,21 +170,21 @@ function BookingHistory({ userId }) {
                 <td>{b.nights}</td>
                 <td>
                   ${b.total?.toLocaleString()}
-                  {b.refund_id && (
-                    <span className="cd-refunded-badge">Refunded</span>
-                  )}
+                  {b.refund_id && <span className="cd-refunded-badge">Refunded</span>}
                 </td>
                 <td><code style={{ fontSize: "0.8rem" }}>{b.confirmation_code}</code></td>
-                <td><span className={`hh-status hh-status-${b.status}`}>{b.status}</span></td>
+                <td><span className={statusClass(b)}>{statusLabel(b)}</span></td>
                 <td>
                   {b.status === "confirmed" && (
                     <button
                       className="hh-btn-ghost hh-btn-danger"
-                      disabled={cancelling === b.id}
-                      onClick={() => cancel(b)}
+                      onClick={() => setRequestingFor(b)}
                     >
-                      {cancelling === b.id ? "Cancelling…" : "Cancel"}
+                      Request cancel
                     </button>
+                  )}
+                  {b.status === "pending_cancellation" && (
+                    <span style={{ fontSize: "0.8rem", color: "var(--ink-soft)" }}>Awaiting review</span>
                   )}
                 </td>
               </tr>
@@ -104,6 +192,14 @@ function BookingHistory({ userId }) {
           </tbody>
         </table>
       </div>
+
+      {requestingFor && (
+        <CancelRequestModal
+          booking={requestingFor}
+          onClose={() => setRequestingFor(null)}
+          onSubmitted={onSubmitted}
+        />
+      )}
     </div>
   );
 }

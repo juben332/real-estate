@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { prettyDate } from "../utils/dateHelpers";
 import Icon, { icons } from "../components/ui/Icon";
-import { cancelBooking } from "../utils/cancelBooking";
+import { approveCancellation, cancelNoRefund } from "../utils/cancelBooking";
 
 /* ─────────────────── OVERVIEW ─────────────────── */
 function Overview({ onNav }) {
@@ -121,37 +121,70 @@ function Bookings() {
     load();
   };
 
-  const handleCancel = async (b, withRefund) => {
-    const msg = withRefund
-      ? `Cancel and refund $${Number(b.total).toLocaleString()} to ${b.guest_email}?`
-      : `Cancel WITHOUT refund? The guest will not get their money back.`;
-    if (!confirm(msg)) return;
+  const handleApprove = async (b) => {
+    const refundAmt = (Number(b.total) * 0.80).toFixed(2);
+    const feeAmt    = (Number(b.total) * 0.20).toFixed(2);
+    if (!confirm(
+      `Approve cancellation for ${b.guest_email}?\n\n` +
+      `Refund to guest: $${refundAmt} (80%)\n` +
+      `Cancellation fee kept: $${feeAmt} (20%)\n\n` +
+      `This will issue a partial refund via Stripe.`
+    )) return;
     setCancelling(b.id);
     setActionMsg("");
-
-    if (withRefund) {
-      const result = await cancelBooking({
-        bookingId:       b.id,
-        paymentIntentId: b.stripe_payment_intent_id,
-      });
-      setCancelling(null);
-      if (!result.success) {
-        setActionMsg(`Error: ${result.error}`);
-      } else {
-        setActionMsg(result.refunded
-          ? `Refund of $${result.amount.toLocaleString()} issued to ${b.guest_email}.`
-          : `Booking cancelled (no payment to refund).`);
-        load();
-      }
+    const result = await approveCancellation({
+      bookingId:       b.id,
+      paymentIntentId: b.stripe_payment_intent_id,
+      total:           b.total,
+    });
+    setCancelling(null);
+    if (!result.success) {
+      setActionMsg(`Error: ${result.error}`);
     } else {
-      await supabase.from("bookings").update({ status: "cancelled" }).eq("id", b.id);
-      setCancelling(null);
-      setActionMsg(`Booking cancelled. No refund issued.`);
+      setActionMsg(
+        result.refunded
+          ? `Approved. $${result.amount.toLocaleString()} refunded to guest. $${result.kept?.toLocaleString()} cancellation fee retained.`
+          : `Cancellation approved. No payment to refund.`
+      );
       load();
     }
   };
 
-  const FILTERS = ["all", "confirmed", "cancelled", "completed"];
+  const handleDeny = async (b) => {
+    if (!confirm(`Deny cancellation request from ${b.guest_email}? Booking will remain confirmed.`)) return;
+    await supabase.from("bookings").update({
+      status:                   "confirmed",
+      cancellation_requested_at: null,
+      cancellation_reason:       null,
+    }).eq("id", b.id);
+    setActionMsg(`Cancellation request denied. Booking restored to confirmed.`);
+    load();
+  };
+
+  const handleAdminCancel = async (b, withRefund) => {
+    if (withRefund) {
+      const refundAmt = (Number(b.total) * 0.80).toFixed(2);
+      if (!confirm(`Cancel and refund 80% ($${refundAmt}) to ${b.guest_email}?`)) return;
+      setCancelling(b.id);
+      setActionMsg("");
+      const result = await approveCancellation({
+        bookingId:       b.id,
+        paymentIntentId: b.stripe_payment_intent_id,
+        total:           b.total,
+      });
+      setCancelling(null);
+      if (!result.success) { setActionMsg(`Error: ${result.error}`); return; }
+      setActionMsg(`Cancelled. $${result.amount.toLocaleString()} refunded (80%).`);
+    } else {
+      if (!confirm(`Cancel WITHOUT refund? Guest will not receive any money back.`)) return;
+      const result = await cancelNoRefund({ bookingId: b.id });
+      if (!result.success) { setActionMsg(`Error: ${result.error}`); return; }
+      setActionMsg(`Booking cancelled. No refund issued.`);
+    }
+    load();
+  };
+
+  const FILTERS = ["all", "confirmed", "pending_cancellation", "cancelled", "completed"];
 
   return (
     <div>
@@ -214,25 +247,53 @@ function Bookings() {
                     {b.refund_id && <span className="cd-refunded-badge">Refunded</span>}
                   </td>
                   <td><code style={{ fontSize: "0.8rem" }}>{b.confirmation_code}</code></td>
-                  <td><span className={`hh-status hh-status-${b.status}`}>{b.status}</span></td>
+                  <td>
+                    <span className={`hh-status hh-status-${b.status === "pending_cancellation" ? "pending" : b.status}`}>
+                      {b.status === "pending_cancellation" ? "Pending cancel" : b.status}
+                    </span>
+                    {b.refund_id && <span className="cd-refunded-badge">Refunded</span>}
+                  </td>
                   <td className="hh-table-actions">
+                    {/* Cancellation request pending — Approve or Deny */}
+                    {b.status === "pending_cancellation" && (
+                      <>
+                        <div className="ap-request-reason">
+                          {b.cancellation_reason && (
+                            <span title={b.cancellation_reason}>"{b.cancellation_reason.slice(0, 40)}{b.cancellation_reason.length > 40 ? "…" : ""}"</span>
+                          )}
+                        </div>
+                        <button
+                          className="hh-btn-ghost"
+                          style={{ color: "#1a6b1a" }}
+                          disabled={cancelling === b.id}
+                          onClick={() => handleApprove(b)}
+                        >
+                          {cancelling === b.id ? "…" : "Approve (80% refund)"}
+                        </button>
+                        <button
+                          className="hh-btn-ghost hh-btn-danger"
+                          onClick={() => handleDeny(b)}
+                        >
+                          Deny
+                        </button>
+                      </>
+                    )}
+                    {/* Normal confirmed booking */}
                     {b.status === "confirmed" && (
                       <>
                         {b.stripe_payment_intent_id && !b.refund_id && (
                           <button
                             className="hh-btn-ghost hh-btn-danger"
                             disabled={cancelling === b.id}
-                            onClick={() => handleCancel(b, true)}
-                            title="Cancel and refund guest"
+                            onClick={() => handleAdminCancel(b, true)}
                           >
-                            {cancelling === b.id ? "…" : "Cancel + Refund"}
+                            {cancelling === b.id ? "…" : "Cancel + 80% refund"}
                           </button>
                         )}
                         <button
                           className="hh-btn-ghost hh-btn-danger"
                           disabled={cancelling === b.id}
-                          onClick={() => handleCancel(b, false)}
-                          title="Cancel without refund"
+                          onClick={() => handleAdminCancel(b, false)}
                         >
                           Cancel only
                         </button>
