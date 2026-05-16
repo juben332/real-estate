@@ -637,7 +637,7 @@ export default function AdminDashboard({ onNavigate }) {
       {/* ── Sidebar ── */}
       <aside className={`ap-sidebar ${sidebarOpen ? "is-open" : ""}`}>
         <div className="ap-sidebar-brand">
-          <span className="ap-sidebar-mark">H&amp;H</span>
+          <img src="/logo.svg" alt="Homely" style={{ width: 36, height: 36, flexShrink: 0 }} />
           <div>
             <span className="ap-sidebar-title">Admin</span>
             <span className="ap-sidebar-email">{user?.email}</span>

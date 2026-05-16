@@ -26,7 +26,7 @@ export default function Register({ onNavigate }) {
   return (
     <div className="hh-auth-page">
       <div className="hh-auth-card">
-        <p className="hh-kicker">Join Hearth &amp; Hollow</p>
+        <p className="hh-kicker">Join Homely</p>
         <h1 className="hh-auth-title">Create account</h1>
         <form onSubmit={submit} className="hh-auth-form">
           <div className="hh-form-group">

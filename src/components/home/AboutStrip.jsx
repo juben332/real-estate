@@ -10,7 +10,7 @@ export default function AboutStrip({ onMore }) {
       <div className="hh-aboutstrip-body">
         <h2 className="hh-h2">We only have four — on purpose.</h2>
         <p>
-          Hearth &amp; Hollow started with one creaky cabin and a belief that renting a place to sleep
+          Homely started with one creaky cabin and a belief that renting a place to sleep
           shouldn't feel like a transaction. We kept it small so every house gets real attention:
           we know which floorboard sings, where the light lands at 4pm, the café worth the walk.
         </p>

@@ -5,7 +5,10 @@ export default function Footer({ onNav }) {
     <footer className="hh-footer">
       <div className="hh-footer-top">
         <div className="hh-footer-brand">
-          <span className="hh-logo-mark">H<span>&</span>H</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <img src="/logo.svg" alt="Homely" style={{ width: 36, height: 36 }} />
+            <span style={{ fontFamily: "Fraunces, serif", fontSize: 20, fontWeight: 500, color: "var(--cream)" }}>Homely</span>
+          </div>
           <p>Small-batch hospitality on the East Coast. Four houses, kept by hand since 2019.</p>
         </div>
         <div className="hh-footer-cols">
@@ -29,7 +32,7 @@ export default function Footer({ onNav }) {
         </div>
       </div>
       <div className="hh-footer-base">
-        <span>© {new Date().getFullYear()} Hearth &amp; Hollow Rentals</span>
+        <span>© {new Date().getFullYear()} Homely Rentals</span>
         <span>Built with care — demo site</span>
       </div>
     </footer>

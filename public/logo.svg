@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Main house body -->
+  <path
+    d="M18 82 L18 46 Q18 40 23 36 L44 18 Q48 14 52 14
+       L52 14 L52 14
+       L52 30 L52 30
+       Q52 30 44 30 L38 36 L38 82 Z"
+    fill="#E84A1A"
+  />
+  <!-- Inner arch / door spiral -->
+  <path
+    d="M38 82 L38 52 Q38 40 50 40 Q62 40 62 52 L62 62
+       Q62 68 56 68 Q50 68 50 62 L50 56
+       Q50 53 53 53 Q56 53 56 56 L56 68 L62 68 L62 82 Z"
+    fill="#E84A1A"
+  />
+  <!-- Upper right open-roof tab -->
+  <path
+    d="M55 14 L80 26 L80 50 L70 50 L70 34 L55 26 Z"
+    fill="#E84A1A"
+  />
+</svg>

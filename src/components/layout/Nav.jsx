@@ -35,7 +35,7 @@ const NAV_ITEMS = [
       {
         title: "Company",
         items: [
-          { label: "Our Story",    description: "How Hearth & Hollow began",    icon: Home,  key: "about"   },
+          { label: "Our Story",    description: "How Homely began",             icon: Home,  key: "about"   },
           { label: "How It Works", description: "Book your stay in 3 steps",    icon: Info,  key: "about"   },
           { label: "Contact Us",   description: "We'd love to hear from you",   icon: Phone, key: "contact" },
         ],
@@ -61,8 +61,8 @@ export default function Nav({ onNav, current, isAdmin }) {
     <header className="hh-nav">
       {/* Logo */}
       <button className="hh-logo" onClick={() => go("home")}>
-        <span className="hh-logo-mark">H<span>&</span>H</span>
-        <span className="hh-logo-word">Hearth &amp; Hollow</span>
+        <img src="/logo.svg" alt="Homely" className="hh-logo-img" />
+        <span className="hh-logo-word">Homely</span>
       </button>
 
       {/* Desktop nav */}
