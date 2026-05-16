@@ -111,8 +111,10 @@ function ProfileEditor() {
 }
 
 export default function ClientDashboard({ onNavigate }) {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, refreshProfile } = useAuth();
   const [tab, setTab] = useState("bookings");
+
+  useEffect(() => { refreshProfile(); }, []);
 
   const handleSignOut = async () => {
     await signOut();

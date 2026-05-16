@@ -38,7 +38,7 @@ export function AuthProvider({ children }) {
     if (error) throw error;
     if (data.user) {
       const role = email === import.meta.env.VITE_ADMIN_EMAIL ? "admin" : "client";
-      await supabase.from("profiles").insert({ id: data.user.id, name, role });
+      await supabase.from("profiles").upsert({ id: data.user.id, name, role });
     }
     return data;
   };
@@ -55,6 +55,11 @@ export function AuthProvider({ children }) {
     setProfile(null);
   };
 
+  const refreshProfile = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) await fetchProfile(session.user.id);
+  };
+
   const updateProfile = async (updates) => {
     const { data, error } = await supabase
       .from("profiles")
@@ -68,7 +73,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signUp, signIn, signOut, updateProfile }}>
+    <AuthContext.Provider value={{ user, profile, loading, signUp, signIn, signOut, updateProfile, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
