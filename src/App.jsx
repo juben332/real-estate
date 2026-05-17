@@ -88,7 +88,7 @@ function AppContent() {
 
       {view.page === "home" && (
         <>
-          <Hero onExplore={() => nav("properties")} />
+          <Hero onExplore={() => nav("properties")} onOpen={open} properties={properties} />
           <Marquee />
           <PropertyGrid
             properties={properties}
