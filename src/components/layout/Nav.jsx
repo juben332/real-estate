@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Home, Building2, MapPin, CalendarDays, Info, Phone, Star, Waves, TreePine } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
@@ -51,6 +51,10 @@ export default function Nav({ onNav, current, isAdmin }) {
   const [hoverBtn, setHoverBtn]     = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled]     = useState(false);
+  const closeTimer = useRef(null);
+
+  const openNav  = (label) => { clearTimeout(closeTimer.current); setOpenMenu(label); };
+  const closeNav = ()      => { closeTimer.current = setTimeout(() => setOpenMenu(null), 200); };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -66,8 +70,8 @@ export default function Nav({ onNav, current, isAdmin }) {
         <div
           key={item.id}
           className="hh-nav-item"
-          onMouseEnter={() => setOpenMenu(item.label)}
-          onMouseLeave={() => setOpenMenu(null)}
+          onMouseEnter={() => openNav(item.label)}
+          onMouseLeave={closeNav}
         >
           <button
             className={`hh-link hh-nav-btn ${current === item.key ? "is-active" : ""}`}
@@ -99,6 +103,8 @@ export default function Nav({ onNav, current, isAdmin }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
                 transition={{ duration: 0.18, ease: "easeOut" }}
+                onMouseEnter={() => clearTimeout(closeTimer.current)}
+                onMouseLeave={closeNav}
               >
                 <div className="hh-dropdown-inner">
                   {item.subMenus.map((sub) => (
