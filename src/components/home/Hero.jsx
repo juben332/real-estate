@@ -1,26 +1,35 @@
 import Icon, { icons } from "../ui/Icon";
-import PhotoMark from "../ui/PhotoMark";
-import { PROPERTIES } from "../../data/properties";
 
 export default function Hero({ onExplore }) {
   return (
     <section className="hh-hero">
-      <div className="hh-hero-grain" />
-      <div className="hh-hero-inner">
+
+      {/* ── Layer 1: blueprint fades in first ── */}
+      <div className="hh-hero-layer hh-hero-blueprint" style={{ backgroundImage: "url('/hero_2_blueprint.png')" }} />
+
+      {/* ── Layer 2: clean house background ── */}
+      <div className="hh-hero-layer hh-hero-clean-bg" style={{ backgroundImage: "url('/hero_1_clean.png')" }} />
+
+      {/* ── Layer 3: brand title drops between bg and fg house ── */}
+      <div className="hh-hero-brand-wrap">
+        <span className="hh-hero-brand">Homely</span>
+      </div>
+
+      {/* ── Layer 4: clean house foreground — masks text behind roofline ── */}
+      <div className="hh-hero-layer hh-hero-clean-fg" style={{ backgroundImage: "url('/hero_1_clean.png')" }} />
+
+      {/* ── Content: fades up after house animation ── */}
+      <div className="hh-hero-content">
         <p className="hh-hero-kicker">Small-batch hospitality · est. 2019</p>
-        <h1 className="hh-hero-title">
-          Stay somewhere<br />
-          <em>actually</em> looked after.
-        </h1>
         <p className="hh-hero-sub">
-          Four hand-kept houses across the East Coast. Check live availability and book
-          directly with us in under a minute — no front desks, no platform fees.
+          Four hand-kept houses across the East Coast.<br />
+          Book directly — no front desks, no platform fees.
         </p>
         <div className="hh-hero-actions">
-          <button className="hh-btn hh-btn-solid" onClick={onExplore}>
+          <button className="hh-btn hh-btn-solid hh-btn-light" onClick={onExplore}>
             Explore the houses <Icon d={icons.arrow} />
           </button>
-          <a className="hh-btn hh-btn-ghost" href="#story">Our story</a>
+          <a className="hh-btn hh-btn-ghost hh-btn-ghost-light" href="#story">Our story</a>
         </div>
         <div className="hh-hero-stats">
           <div><strong>4</strong><span>houses</span></div>
@@ -29,16 +38,6 @@ export default function Hero({ onExplore }) {
         </div>
       </div>
 
-      <div className="hh-hero-card" style={{ "--c": PROPERTIES[0].hue, "--a": PROPERTIES[0].accent }}>
-        <div className="hh-hero-card-photo">
-          <PhotoMark label={PROPERTIES[0].name} />
-        </div>
-        <div className="hh-hero-card-body">
-          <span className="hh-tag">Guest favourite</span>
-          <h3>{PROPERTIES[0].name}</h3>
-          <p>{PROPERTIES[0].location}</p>
-        </div>
-      </div>
     </section>
   );
 }
