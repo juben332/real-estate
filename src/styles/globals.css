@@ -41,7 +41,7 @@
   box-shadow: 0 1px 24px rgba(33,28,21,0.07);
 }
 .hh-nav.is-scrolled .hh-link             { color: var(--ink-soft); }
-.hh-nav.is-scrolled .hh-link:hover       { color: var(--ink); background: var(--bg-2); }
+.hh-nav.is-scrolled .hh-link:hover       { color: var(--ink); background: none; }
 .hh-nav.is-scrolled .hh-link.is-active   { color: var(--ink); }
 .hh-nav.is-scrolled .hh-link-cta         { background: var(--ink); color: var(--cream); }
 .hh-nav.is-scrolled .hh-link-cta:hover   { background: var(--terra); color: #fff; }
@@ -59,7 +59,7 @@
   font-size: 15px; padding: 9px 14px; border-radius: 999px;
   transition: color .2s, background .2s; cursor: pointer;
 }
-.hh-link:hover { color: #fff; background: rgba(255,255,255,0.12); }
+.hh-link:hover { color: #fff; background: none; }
 .hh-link.is-active { color: #fff; }
 .hh-link-cta { background: #fff; color: #05122b; }
 .hh-link-cta:hover { background: var(--terra); color: #fff; }
