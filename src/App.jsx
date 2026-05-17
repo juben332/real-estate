@@ -101,36 +101,40 @@ function AppContent() {
       )}
 
       {view.page === "properties" && (
-        <section className="hh-section">
-          <PageHead
-            kicker="The Collection"
-            title="Every door we keep"
-            sub="Four small houses, each looked after like it's our own — because it is. Live availability, instant booking."
-          />
-          <PropertyGrid
-            properties={properties}
-            loading={propLoading}
-            onOpen={open}
-          />
-        </section>
+        <div className="hh-page-offset">
+          <section className="hh-section">
+            <PageHead
+              kicker="The Collection"
+              title="Every door we keep"
+              sub="Four small houses, each looked after like it's our own — because it is. Live availability, instant booking."
+            />
+            <PropertyGrid
+              properties={properties}
+              loading={propLoading}
+              onOpen={open}
+            />
+          </section>
+        </div>
       )}
 
       {view.page === "property" && active && (
-        <PropertyDetail
-          property={active}
-          propertyBookings={bookings[active.id] || []}
-          onAddBooking={fetchAvailability}
-          onBack={() => nav("properties")}
-        />
+        <div className="hh-page-offset">
+          <PropertyDetail
+            property={active}
+            propertyBookings={bookings[active.id] || []}
+            onAddBooking={fetchAvailability}
+            onBack={() => nav("properties")}
+          />
+        </div>
       )}
 
-      {view.page === "about"    && <About />}
-      {view.page === "contact"  && <Contact />}
-      {view.page === "login"    && <Login    onNavigate={nav} />}
-      {view.page === "register" && <Register onNavigate={nav} />}
+      {view.page === "about"    && <div className="hh-page-offset"><About /></div>}
+      {view.page === "contact"  && <div className="hh-page-offset"><Contact /></div>}
+      {view.page === "login"    && <div className="hh-page-offset"><Login    onNavigate={nav} /></div>}
+      {view.page === "register" && <div className="hh-page-offset"><Register onNavigate={nav} /></div>}
 
       {view.page === "dashboard" && user && !isAdmin && (
-        <ClientDashboard onNavigate={nav} />
+        <div className="hh-page-offset"><ClientDashboard onNavigate={nav} /></div>
       )}
 
       <Footer onNav={nav} />
