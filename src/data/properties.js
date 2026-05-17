@@ -10,6 +10,7 @@ export const PROPERTIES = [
     guests: 4,
     hue: "#2A3B2D",
     accent: "#C4622D",
+    image: "/Pine.jpg",
     blurb:
       "Floor-to-ceiling glass, a wood stove that ticks through the night, and a deck that hangs over the forest floor. Mornings here smell like resin and coffee.",
     amenities: ["Wood-burning stove", "Outdoor soaking tub", "Fast Wi-Fi", "Trailhead on-site", "Full kitchen", "EV charger"],

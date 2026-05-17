@@ -30,7 +30,11 @@ export default function PropertyDetail({ property, propertyBookings, onAddBookin
       </button>
 
       <div className="hh-detail-hero">
-        <div className="hh-detail-photo hh-detail-photo-lg"><PhotoMark label={p.name} /></div>
+        <div className="hh-detail-photo hh-detail-photo-lg">
+          {p.image
+            ? <img src={p.image} alt={p.name} className="hh-detail-img" />
+            : <PhotoMark label={p.name} />}
+        </div>
         <div className="hh-detail-photo"><PhotoMark label="The view" alt /></div>
         <div className="hh-detail-photo"><PhotoMark label="Inside"   alt /></div>
       </div>

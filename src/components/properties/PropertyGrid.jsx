@@ -22,7 +22,9 @@ export default function PropertyGrid({ properties = [], loading, onOpen, heading
               onClick={() => onOpen(p.id)}
             >
               <div className="hh-card-photo">
-                <PhotoMark label={p.name} />
+                {p.image
+                  ? <img src={p.image} alt={p.name} className="hh-card-img" />
+                  : <PhotoMark label={p.name} />}
                 <span className="hh-card-price">${p.price}<i>/night</i></span>
               </div>
               <div className="hh-card-body">
