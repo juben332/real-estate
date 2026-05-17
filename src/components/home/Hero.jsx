@@ -1,4 +1,6 @@
 import Icon, { icons } from "../ui/Icon";
+import PhotoMark from "../ui/PhotoMark";
+import { PROPERTIES } from "../../data/properties";
 
 export default function Hero({ onExplore }) {
   return (
@@ -17,6 +19,18 @@ export default function Hero({ onExplore }) {
 
       {/* ── Layer 4: clean house foreground — masks text behind roofline ── */}
       <div className="hh-hero-layer hh-hero-clean-fg" style={{ backgroundImage: "url('/hero_1_clean.png')" }} />
+
+      {/* ── Floating property card ── */}
+      <div className="hh-hero-card" style={{ "--c": PROPERTIES[0].hue, "--a": PROPERTIES[0].accent }}>
+        <div className="hh-hero-card-photo">
+          <PhotoMark label={PROPERTIES[0].name} />
+        </div>
+        <div className="hh-hero-card-body">
+          <span className="hh-tag">Guest favourite</span>
+          <h3>{PROPERTIES[0].name}</h3>
+          <p>{PROPERTIES[0].location}</p>
+        </div>
+      </div>
 
       {/* ── Content: fades up after house animation ── */}
       <div className="hh-hero-content">

@@ -229,6 +229,26 @@
 
 .hh-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; background: var(--terra); color: #fff; padding: 4px 10px; border-radius: 999px; }
 
+.hh-hero-card {
+  position: absolute; right: clamp(24px, 6vw, 80px); top: 50%; z-index: 30;
+  transform: translateY(-50%) rotate(1.6deg);
+  width: clamp(200px, 22vw, 300px);
+  background: var(--cream); border: 1px solid var(--line);
+  border-radius: 20px; overflow: hidden;
+  box-shadow: 0 30px 60px -10px rgba(5,18,43,0.5);
+  animation: hh-floaty 6s ease-in-out 6s infinite;
+  opacity: 0; animation-fill-mode: forwards;
+}
+@keyframes hh-floaty {
+  0%   { opacity: 1; transform: translateY(-50%) rotate(1.6deg); }
+  50%  { opacity: 1; transform: translateY(calc(-50% - 10px)) rotate(1.6deg); }
+  100% { opacity: 1; transform: translateY(-50%) rotate(1.6deg); }
+}
+.hh-hero-card-photo { aspect-ratio: 4/3.4; }
+.hh-hero-card-body  { padding: 16px 18px 20px; }
+.hh-hero-card-body h3 { font-size: 18px; margin: 8px 0 2px; }
+.hh-hero-card-body p  { font-size: 13px; color: var(--ink-soft); }
+
 /* ── MARQUEE ── */
 .hh-marquee { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--ink); color: var(--cream); overflow: hidden; padding: 14px 0; }
 .hh-marquee-track { display: flex; gap: 38px; width: max-content; animation: scroll 26s linear infinite; }
@@ -548,6 +568,7 @@
 /* ── RESPONSIVE ── */
 @media (max-width: 980px) {
   .hh-hero-brand { font-size: 28vw; }
+  .hh-hero-card  { display: none; }
   .hh-detail-grid { grid-template-columns: 1fr; }
   .hh-booking { position: static; }
   .hh-about-cols { grid-template-columns: 1fr; }
