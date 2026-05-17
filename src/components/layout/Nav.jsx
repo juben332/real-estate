@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Home, Building2, MapPin, CalendarDays, Info, Phone, Star, Waves, TreePine } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
@@ -47,9 +47,16 @@ const NAV_ITEMS = [
 
 export default function Nav({ onNav, current, isAdmin }) {
   const { user, profile } = useAuth();
-  const [openMenu, setOpenMenu]   = useState(null);
-  const [hoverBtn, setHoverBtn]   = useState(null);
+  const [openMenu, setOpenMenu]     = useState(null);
+  const [hoverBtn, setHoverBtn]     = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled]     = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const go = (key) => { onNav(key); setOpenMenu(null); setMobileOpen(false); };
 
@@ -125,7 +132,7 @@ export default function Nav({ onNav, current, isAdmin }) {
   );
 
   return (
-    <header className="hh-nav">
+    <header className={`hh-nav ${scrolled ? "is-scrolled" : ""}`}>
 
       {/* ── Left: logo ── */}
       <button className="hh-logo hh-nav-left-logo" onClick={() => go("home")}>
