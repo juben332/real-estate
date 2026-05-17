@@ -253,18 +253,22 @@
 
 .hh-hero-card {
   position: absolute; right: clamp(24px, 6vw, 80px); top: 50%; z-index: 30;
-  transform: translateY(-50%) rotate(1.6deg);
   width: clamp(200px, 22vw, 300px);
   background: var(--cream); border: 1px solid var(--line);
   border-radius: 20px; overflow: hidden;
   box-shadow: 0 30px 60px -10px rgba(5,18,43,0.5);
-  animation: hh-floaty 6s ease-in-out 6s infinite;
-  opacity: 0; animation-fill-mode: forwards;
+  opacity: 0;
+  animation:
+    hh-card-in  0.9s cubic-bezier(.34,1.2,.64,1) 5.8s both,
+    hh-floaty   6s  ease-in-out                  6.8s infinite;
+}
+@keyframes hh-card-in {
+  0%   { opacity: 0; transform: translateY(calc(-50% + 36px)) rotate(1.6deg); }
+  100% { opacity: 1; transform: translateY(-50%) rotate(1.6deg); }
 }
 @keyframes hh-floaty {
-  0%   { opacity: 1; transform: translateY(-50%) rotate(1.6deg); }
-  50%  { opacity: 1; transform: translateY(calc(-50% - 10px)) rotate(1.6deg); }
-  100% { opacity: 1; transform: translateY(-50%) rotate(1.6deg); }
+  0%,100% { transform: translateY(-50%) rotate(1.6deg); }
+  50%     { transform: translateY(calc(-50% - 10px)) rotate(1.6deg); }
 }
 .hh-hero-card-photo { aspect-ratio: 4/3.4; }
 .hh-hero-card-body  { padding: 16px 18px 20px; }
