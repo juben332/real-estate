@@ -15,6 +15,7 @@ import Register from "./pages/Register";
 import ClientDashboard from "./pages/ClientDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import PageHead from "./components/ui/PageHead";
+import { PROPERTIES as LOCAL_PROPS } from "./data/properties";
 
 function AppContent() {
   const { user, profile, loading: authLoading } = useAuth();
@@ -34,7 +35,14 @@ function AppContent() {
       .eq("active", true)
       .order("created_at")
       .then(({ data }) => {
-        setProperties(data || []);
+        const localImageMap = Object.fromEntries(
+          LOCAL_PROPS.filter((p) => p.image).map((p) => [p.id, p.image])
+        );
+        const merged = (data || []).map((p) => ({
+          ...p,
+          image: p.image || localImageMap[p.id] || null,
+        }));
+        setProperties(merged);
         setPropLoading(false);
       });
   }, []);
