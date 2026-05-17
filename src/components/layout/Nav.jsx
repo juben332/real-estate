@@ -90,7 +90,7 @@ export default function Nav({ onNav, current, isAdmin }) {
               <motion.span
                 layoutId="nav-hover-bg"
                 className="hh-nav-hover-bg"
-                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                transition={{ type: "spring", stiffness: 180, damping: 28 }}
               />
             )}
           </button>
