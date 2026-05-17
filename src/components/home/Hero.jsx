@@ -23,7 +23,9 @@ export default function Hero({ onExplore }) {
       {/* ── Floating property card ── */}
       <div className="hh-hero-card" style={{ "--c": PROPERTIES[0].hue, "--a": PROPERTIES[0].accent }}>
         <div className="hh-hero-card-photo">
-          <PhotoMark label={PROPERTIES[0].name} />
+          {PROPERTIES[0].image
+            ? <img src={PROPERTIES[0].image} alt={PROPERTIES[0].name} className="hh-hero-card-img" />
+            : <PhotoMark label={PROPERTIES[0].name} />}
         </div>
         <div className="hh-hero-card-body">
           <span className="hh-tag">Guest favourite</span>

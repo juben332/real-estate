@@ -273,7 +273,8 @@
   0%,100% { transform: translateY(-50%) rotate(1.6deg); }
   50%     { transform: translateY(calc(-50% - 10px)) rotate(1.6deg); }
 }
-.hh-hero-card-photo { aspect-ratio: 4/3.4; }
+.hh-hero-card-photo { aspect-ratio: 4/3.4; position: relative; overflow: hidden; border-radius: 12px 12px 0 0; }
+.hh-hero-card-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .hh-hero-card-body  { padding: 16px 18px 20px; }
 .hh-hero-card-body h3 { font-size: 18px; margin: 8px 0 2px; }
 .hh-hero-card-body p  { font-size: 13px; color: var(--ink-soft); }
