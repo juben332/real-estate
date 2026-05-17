@@ -48,7 +48,6 @@ const NAV_ITEMS = [
 export default function Nav({ onNav, current, isAdmin }) {
   const { user, profile } = useAuth();
   const [openMenu, setOpenMenu]     = useState(null);
-  const [hoverBtn, setHoverBtn]     = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled]     = useState(false);
   const closeTimer = useRef(null);
@@ -76,8 +75,6 @@ export default function Nav({ onNav, current, isAdmin }) {
           <button
             className={`hh-link hh-nav-btn ${current === item.key ? "is-active" : ""}`}
             onClick={() => item.key && go(item.key)}
-            onMouseEnter={() => setHoverBtn(item.id)}
-            onMouseLeave={() => setHoverBtn(null)}
           >
             <span>{item.label}</span>
             {item.subMenus && (
@@ -86,13 +83,7 @@ export default function Nav({ onNav, current, isAdmin }) {
                 className={`hh-nav-chevron ${openMenu === item.label ? "is-open" : ""}`}
               />
             )}
-            {(hoverBtn === item.id || openMenu === item.label) && (
-              <motion.span
-                layoutId="nav-hover-bg"
-                className="hh-nav-hover-bg"
-                transition={{ type: "tween", ease: "easeInOut", duration: 0.35 }}
-              />
-            )}
+            <span className="hh-nav-hover-bg" />
           </button>
 
           <AnimatePresence>

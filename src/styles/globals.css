@@ -95,7 +95,11 @@
   background: var(--terra);
   border-radius: 999px;
   z-index: -1;
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
+.hh-nav-btn:hover .hh-nav-hover-bg,
+.hh-nav-btn.is-active .hh-nav-hover-bg { opacity: 1; }
 .hh-nav-chevron {
   transition: transform 0.25s ease;
   flex-shrink: 0;
