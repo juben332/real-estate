@@ -15,6 +15,7 @@ import Register from "./pages/Register";
 import ClientDashboard from "./pages/ClientDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import PageHead from "./components/ui/PageHead";
+import SocialSidebar from "./components/layout/SocialSidebar";
 import { PROPERTIES as LOCAL_PROPS } from "./data/properties";
 
 function AppContent() {
@@ -93,6 +94,7 @@ function AppContent() {
   return (
     <div className="hh-root">
       <Nav onNav={nav} current={view.page} isAdmin={isAdmin} />
+      <SocialSidebar />
 
       {view.page === "home" && (
         <>
