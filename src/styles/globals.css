@@ -1311,6 +1311,20 @@
   .ap-content { padding: 20px 16px 40px; }
   .ap-topbar { padding: 14px 16px; }
 }
+/* ── SCROLL SNAP HOME ── */
+.hh-snap-container {
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+.hh-snap-section {
+  scroll-snap-align: start;
+  min-height: 100vh;
+  overflow: hidden;
+}
+.hh-snap-section:first-child { min-height: 100vh; }
+
 /* ── SOCIAL SIDEBAR ── */
 .hh-social-sidebar {
   position: fixed;
