@@ -246,8 +246,8 @@
 .hh-btn-ghost:hover { background: var(--ink); color: var(--cream); }
 .hh-btn-light { background: #fff; color: #000000; }
 .hh-btn-light:hover { background: var(--terra); color: #fff; }
-.hh-btn-ghost-light { background: transparent; color: #fff; border-color: rgba(255,255,255,0.5); }
-.hh-btn-ghost-light:hover { background: rgba(255,255,255,0.15); border-color: #fff; }
+.hh-btn-ghost-light { background: transparent; color: var(--terra); border-color: var(--terra); }
+.hh-btn-ghost-light:hover { background: rgba(196,98,45,0.12); border-color: var(--terra); }
 .hh-btn-full  { width: 100%; }
 .hh-btn-outline { background: transparent; color: var(--ink); border: 1.5px solid var(--line); }
 .hh-btn-outline:hover { border-color: var(--ink); }
