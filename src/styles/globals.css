@@ -45,6 +45,7 @@
 .hh-nav.is-scrolled .hh-link.is-active   { color: var(--ink); }
 .hh-nav.is-scrolled .hh-link-cta         { background: var(--ink); color: var(--cream); }
 .hh-nav.is-scrolled .hh-link-cta:hover   { background: var(--terra); color: #fff; }
+.hh-nav.is-scrolled .hh-link-signin      { background: var(--terra) !important; color: #fff !important; }
 .hh-nav.is-scrolled .hh-logo-word        { color: var(--ink); }
 .hh-nav-left-logo { justify-self: start; }
 .hh-nav-center { display: flex; align-items: center; gap: 4px; justify-self: center; }
@@ -743,17 +744,16 @@
 
 /* ── Nav sign-in ── */
 .hh-link-signin {
-  background: var(--terra); border: 1.5px solid var(--terra);
-  color: #fff; border-radius: 999px;
+  background: var(--terra) !important; border: 1.5px solid var(--terra) !important;
+  color: #fff !important; border-radius: 999px;
   padding: 7px 20px; font-size: .875rem; font-weight: 600;
-  cursor: pointer; transition: background .2s, box-shadow .2s, transform .15s;
+  cursor: pointer; transition: opacity .2s, box-shadow .2s, transform .15s;
   margin-left: .5rem;
   box-shadow: 0 2px 10px rgba(196,98,45,0.30);
   letter-spacing: 0.01em;
 }
-.hh-link-signin:hover {
-  background: #a84e22;
-  border-color: #a84e22;
+.hh-link-signin:hover, .hh-link-signin:active {
+  opacity: 0.82;
   box-shadow: 0 4px 18px rgba(196,98,45,0.40);
   transform: translateY(-1px);
 }
