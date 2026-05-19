@@ -97,10 +97,7 @@ function AppContent() {
       <SocialSidebar />
 
       {view.page === "home" && (
-        <>
-          <Hero onExplore={() => nav("properties")} />
-          <Marquee />
-        </>
+        <Hero onExplore={() => nav("properties")} />
       )}
 
       {view.page === "properties" && (
