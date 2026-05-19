@@ -61,6 +61,8 @@ export default function Nav({ onNav, current, isAdmin }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const isScrolled = current !== "home" || scrolled;
+
   const go = (key) => { onNav(key); setOpenMenu(null); setMobileOpen(false); };
 
   const NavLinks = () => (
@@ -129,7 +131,7 @@ export default function Nav({ onNav, current, isAdmin }) {
   );
 
   return (
-    <header className={`hh-nav ${scrolled ? "is-scrolled" : ""}`}>
+    <header className={`hh-nav ${isScrolled ? "is-scrolled" : ""}`}>
 
       {/* ── Left: logo ── */}
       <button className="hh-logo hh-nav-left-logo" onClick={() => go("home")}>
