@@ -46,7 +46,6 @@ export default function SocialSidebar() {
           {icon}
         </a>
       ))}
-      <span className="hh-social-line" />
     </div>
   );
 }
