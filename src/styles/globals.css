@@ -43,9 +43,8 @@
 .hh-nav.is-scrolled .hh-link             { color: var(--ink-soft); }
 .hh-nav.is-scrolled .hh-link:hover       { color: var(--ink); background: none; }
 .hh-nav.is-scrolled .hh-link.is-active   { color: var(--ink); }
-.hh-nav.is-scrolled .hh-link-cta         { border-color: rgba(0,0,0,0.3); color: var(--ink); }
-.hh-nav.is-scrolled .hh-link-cta:hover   { background: var(--ink); color: #fff; border-color: var(--ink); }
-.hh-nav.is-scrolled .hh-link-signin      { background: var(--terra) !important; color: #fff !important; }
+.hh-nav.is-scrolled .hh-link-cta         { background: var(--terra) !important; color: #fff !important; }
+.hh-nav.is-scrolled .hh-link-cta:hover   { opacity: 0.85; }
 .hh-nav.is-scrolled .hh-logo-word        { color: var(--ink); }
 .hh-nav-left-logo { justify-self: start; }
 .hh-nav-center { display: flex; align-items: center; gap: 4px; justify-self: center; }
@@ -62,8 +61,8 @@
 }
 .hh-link:hover { color: #fff; background: none; }
 .hh-link.is-active { color: #fff; }
-.hh-link-cta { background: none; border: 1.5px solid rgba(255,255,255,0.5); color: #fff; border-radius: 999px; padding: 7px 18px; font-size: 14px; font-weight: 500; transition: background 0.18s, border-color 0.18s; }
-.hh-link-cta:hover { background: rgba(255,255,255,0.13); border-color: rgba(255,255,255,0.8); }
+.hh-link-cta { background: var(--terra) !important; color: #fff !important; border: none; border-radius: 999px; padding: 8px 20px; font-size: 14px; font-weight: 600; box-shadow: 0 2px 12px rgba(196,98,45,0.35); transition: opacity 0.18s, transform 0.15s, box-shadow 0.18s; letter-spacing: 0.01em; }
+.hh-link-cta:hover, .hh-link-cta:active { opacity: 0.85; transform: translateY(-1px); box-shadow: 0 4px 18px rgba(196,98,45,0.45); }
 .hh-logo-word { color: #fff; }
 
 .hh-burger { display: none; flex-direction: column; gap: 5px; background: none; border: none; padding: 8px; cursor: pointer; grid-column: 3; justify-self: end; }
@@ -744,18 +743,23 @@
 
 /* ── Nav sign-in ── */
 .hh-link-signin {
-  background: var(--terra) !important; border: 1.5px solid var(--terra) !important;
+  background: none !important; border: 1.5px solid rgba(255,255,255,0.5) !important;
   color: #fff !important; border-radius: 999px;
-  padding: 7px 20px; font-size: .875rem; font-weight: 600;
-  cursor: pointer; transition: opacity .2s, box-shadow .2s, transform .15s;
-  margin-left: .5rem;
-  box-shadow: 0 2px 10px rgba(196,98,45,0.30);
-  letter-spacing: 0.01em;
+  padding: 7px 18px; font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: background 0.18s, border-color 0.18s;
+  margin-left: .25rem;
 }
 .hh-link-signin:hover, .hh-link-signin:active {
-  opacity: 0.82;
-  box-shadow: 0 4px 18px rgba(196,98,45,0.40);
-  transform: translateY(-1px);
+  background: rgba(255,255,255,0.13) !important;
+  border-color: rgba(255,255,255,0.8) !important;
+}
+.hh-nav.is-scrolled .hh-link-signin {
+  border-color: rgba(0,0,0,0.3) !important;
+  color: var(--ink) !important;
+}
+.hh-nav.is-scrolled .hh-link-signin:hover {
+  background: var(--bg-2) !important;
+  border-color: var(--ink) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════
