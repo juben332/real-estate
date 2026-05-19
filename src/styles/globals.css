@@ -28,9 +28,9 @@
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   padding: 14px clamp(20px, 5vw, 64px);
-  background: rgba(253,253,253,0.92);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--line);
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom: 1px solid transparent;
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .hh-page-offset { padding-top: 72px; }
@@ -55,15 +55,15 @@
 .hh-logo-word { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 500; }
 
 .hh-link {
-  background: none; border: none; color: var(--ink);
+  background: none; border: none; color: rgba(255,255,255,0.75);
   font-size: 15px; padding: 9px 14px; border-radius: 999px;
   transition: color .2s, background .2s; cursor: pointer;
 }
-.hh-link:hover { color: var(--ink); background: var(--bg-2); }
-.hh-link.is-active { color: var(--ink); font-weight: 600; }
-.hh-link-cta { background: var(--ink); color: var(--cream); }
-.hh-link-cta:hover { background: #333; color: #fff; }
-.hh-logo-word { color: var(--ink); }
+.hh-link:hover { color: #fff; background: none; }
+.hh-link.is-active { color: #fff; }
+.hh-link-cta { background: #fff; color: #000000; }
+.hh-link-cta:hover { background: var(--terra); color: #fff; }
+.hh-logo-word { color: #fff; }
 
 .hh-burger { display: none; flex-direction: column; gap: 5px; background: none; border: none; padding: 8px; cursor: pointer; grid-column: 3; justify-self: end; }
 .hh-burger span { width: 22px; height: 2px; background: var(--ink); border-radius: 2px; transition: .3s; }
