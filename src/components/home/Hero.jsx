@@ -45,7 +45,7 @@ export default function Hero({ onExplore }) {
           <button className="hh-btn hh-btn-solid hh-btn-light" onClick={onExplore}>
             Explore the houses <Icon d={icons.arrow} />
           </button>
-          <a className="hh-btn hh-btn-ghost hh-btn-ghost-light" href="#story">Our story</a>
+          <a className="hh-btn hh-btn-ghost-light" href="#story">Our story</a>
         </div>
         <div className="hh-hero-stats">
           <div><strong>4</strong><span>houses</span></div>
