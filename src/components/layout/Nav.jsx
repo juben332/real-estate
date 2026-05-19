@@ -130,18 +130,22 @@ export default function Nav({ onNav, current, isAdmin }) {
       <header className={`hh-nav ${isScrolled ? "is-scrolled" : ""}`}>
         <div className="hh-nav-island">
 
-          {/* Left: nav links */}
-          <nav className="hh-nav-links">
-            <NavLinks />
-          </nav>
-
-          {/* Center: logo */}
-          <button className="hh-logo hh-logo-center" onClick={() => go("home")}>
+          {/* Logo */}
+          <button className="hh-logo" onClick={() => go("home")}>
             <img src="/logo.svg" alt="Homely" className="hh-logo-img" />
             <span className="hh-logo-word">Homely</span>
           </button>
 
-          {/* Right: auth */}
+          <span className="hh-nav-sep" />
+
+          {/* Nav links */}
+          <nav className="hh-nav-links">
+            <NavLinks />
+          </nav>
+
+          <span className="hh-nav-sep" />
+
+          {/* Auth */}
           <div className="hh-nav-actions">
             {user ? (
               <button
@@ -158,11 +162,7 @@ export default function Nav({ onNav, current, isAdmin }) {
             )}
           </div>
 
-          {/* Mobile: logo left + burger right */}
-          <button className="hh-logo hh-logo-mobile" onClick={() => go("home")}>
-            <img src="/logo.svg" alt="Homely" className="hh-logo-img" />
-            <span className="hh-logo-word">Homely</span>
-          </button>
+          {/* Mobile burger */}
           <button
             className={`hh-burger ${mobileOpen ? "is-open" : ""}`}
             onClick={() => setMobileOpen(o => !o)}
