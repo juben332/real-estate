@@ -8,7 +8,7 @@
   --ink: #000000;
   --ink-soft: #666666;
   --line: #e0e0e0;
-  --terra: #000000;
+  --terra: #C4622D;
   --cream: #fdfdfd;
   font-family: 'DM Sans', system-ui, sans-serif;
   background: var(--bg);
@@ -715,7 +715,7 @@
 .hh-auth-switch { margin-top: 1.5rem; text-align: center; font-size: .875rem; color: var(--ink-soft); }
 .hh-auth-link {
   background: none; border: none;
-  color: var(--accent, #000000);
+  color: var(--accent, #C4622D);
   cursor: pointer; font-weight: 600; padding: 0;
   text-decoration: underline; font-size: inherit;
 }
@@ -1040,7 +1040,7 @@
 }
 .ap-sidebar-mark {
   width: 38px; height: 38px;
-  background: var(--terra, #000000);
+  background: var(--terra, #C4622D);
   color: #fff;
   border-radius: 10px;
   display: grid; place-items: center;
@@ -1087,8 +1087,8 @@
   font-family: 'DM Sans', sans-serif;
 }
 .ap-nav-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
-.ap-nav-item.is-active { background: rgba(255,255,255,0.15); color: #ffffff; }
-.ap-nav-item.is-active svg { color: #ffffff; }
+.ap-nav-item.is-active { background: rgba(196,98,45,0.2); color: #e8895a; }
+.ap-nav-item.is-active svg { color: #e8895a; }
 .ap-sidebar-footer {
   padding: 16px 12px;
   border-top: 1px solid rgba(255,255,255,0.08);
@@ -1180,7 +1180,7 @@
 }
 .ap-link-btn {
   background: none; border: none;
-  color: var(--terra, #000000);
+  color: var(--terra, #C4622D);
   font-size: 14px; font-weight: 600;
   cursor: pointer; padding: 0;
   font-family: 'DM Sans', sans-serif;
@@ -1335,7 +1335,7 @@
   color: #fff;
   border-color: var(--terra);
   transform: translateY(-2px) scale(1.08);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 18px rgba(196,98,45,0.28);
 }
 .hh-social-line {
   width: 1px;
