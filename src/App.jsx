@@ -97,23 +97,17 @@ function AppContent() {
       <SocialSidebar />
 
       {view.page === "home" && (
-        <div className="hh-snap-container">
-          <section className="hh-snap-section">
-            <Hero onExplore={() => nav("properties")} />
-          </section>
-          <section className="hh-snap-section">
-            <Marquee />
-            <PropertyGrid
-              properties={properties}
-              loading={propLoading}
-              onOpen={open}
-              heading="Four places to land"
-            />
-          </section>
-          <section className="hh-snap-section">
-            <AboutStrip onMore={() => nav("about")} />
-          </section>
-        </div>
+        <>
+          <Hero onExplore={() => nav("properties")} />
+          <Marquee />
+          <PropertyGrid
+            properties={properties}
+            loading={propLoading}
+            onOpen={open}
+            heading="Four places to land"
+          />
+          <AboutStrip onMore={() => nav("about")} />
+        </>
       )}
 
       {view.page === "properties" && (
