@@ -136,14 +136,10 @@ export default function Nav({ onNav, current, isAdmin }) {
             <span className="hh-logo-word">Homely</span>
           </button>
 
-          <span className="hh-nav-sep" />
-
           {/* Nav links */}
           <nav className="hh-nav-links">
             <NavLinks />
           </nav>
-
-          <span className="hh-nav-sep" />
 
           {/* Auth */}
           <div className="hh-nav-actions">
