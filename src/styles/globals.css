@@ -596,6 +596,9 @@
 .hh-footer-cols button:hover,
 .hh-footer-cols a:hover { color: var(--cream); }
 .hh-footer-base { max-width: 1320px; margin: 0 auto; padding: 22px clamp(20px,5vw,64px); border-top: 1px solid rgba(255,255,255,0.12); display: flex; justify-content: space-between; font-size: 13px; color: rgba(255,255,255,0.5); flex-wrap: wrap; gap: 8px; }
+.hh-footer-socials { display: flex; gap: 10px; margin-top: 14px; }
+.hh-footer-social-btn { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); transition: background 0.2s, color 0.2s; }
+.hh-footer-social-btn:hover { background: var(--terra); color: #fff; }
 
 /* ── RESPONSIVE ── */
 
