@@ -100,13 +100,6 @@ function AppContent() {
         <>
           <Hero onExplore={() => nav("properties")} />
           <Marquee />
-          <PropertyGrid
-            properties={properties}
-            loading={propLoading}
-            onOpen={open}
-            heading="Four places to land"
-          />
-          <AboutStrip onMore={() => nav("about")} />
         </>
       )}
 
