@@ -617,7 +617,7 @@
 @media (max-width: 760px) {
   /* Nav */
   .hh-nav               { grid-template-columns: auto 1fr auto; padding: 12px 18px; background: rgba(253,253,253,0.95); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
-  .hh-logo-word         { color: var(--ink) !important; }
+  .hh-logo-word         { display: none; }
   .hh-burger span       { background: var(--ink) !important; }
   .hh-nav-center        { display: none; }
   .hh-nav-right         { display: none; }
