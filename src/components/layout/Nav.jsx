@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Home, Building2, MapPin, CalendarDays, Info, Phone, Star, Waves, TreePine } from "lucide-react";
+import { ChevronDown, Building2, MapPin, CalendarDays, Info, Phone, Star, Waves, TreePine, Home } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 const NAV_ITEMS = [
@@ -35,9 +35,9 @@ const NAV_ITEMS = [
       {
         title: "Company",
         items: [
-          { label: "Our Story",    description: "How Homely began",            icon: Home,  key: "about"   },
-          { label: "How It Works", description: "Book your stay in 3 steps",   icon: Info,  key: "about"   },
-          { label: "Contact Us",   description: "We'd love to hear from you",  icon: Phone, key: "contact" },
+          { label: "Our Story",    description: "How Homely began",           icon: Home,  key: "about"   },
+          { label: "How It Works", description: "Book your stay in 3 steps",  icon: Info,  key: "about"   },
+          { label: "Contact Us",   description: "We'd love to hear from you", icon: Phone, key: "contact" },
         ],
       },
     ],
@@ -56,46 +56,41 @@ export default function Nav({ onNav, current, isAdmin }) {
   const closeNav = ()      => { closeTimer.current = setTimeout(() => setOpenMenu(null), 200); };
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
+    const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const isScrolled = current !== "home" || scrolled;
-
   const go = (key) => { onNav(key); setOpenMenu(null); setMobileOpen(false); };
 
-  const NavLinks = () => (
+  const NavLinks = ({ mobile = false }) => (
     <>
       {NAV_ITEMS.map((item) => (
         <div
           key={item.id}
           className="hh-nav-item"
-          onMouseEnter={() => openNav(item.label)}
-          onMouseLeave={closeNav}
+          onMouseEnter={() => !mobile && openNav(item.label)}
+          onMouseLeave={() => !mobile && closeNav()}
         >
           <button
-            className={`hh-link hh-nav-btn ${current === item.key ? "is-active" : ""}`}
-            onClick={() => item.key && go(item.key)}
+            className={`hh-navlink ${current === item.key ? "is-active" : ""} ${mobile ? "is-mobile" : ""}`}
+            onClick={() => { item.key && go(item.key); mobile && item.subMenus && openNav(openMenu === item.label ? null : item.label); }}
           >
             <span>{item.label}</span>
             {item.subMenus && (
-              <ChevronDown
-                size={14}
-                className={`hh-nav-chevron ${openMenu === item.label ? "is-open" : ""}`}
-              />
+              <ChevronDown size={13} className={`hh-nav-chevron ${openMenu === item.label ? "is-open" : ""}`} />
             )}
-            <span className="hh-nav-hover-bg" />
           </button>
 
           <AnimatePresence>
             {openMenu === item.label && item.subMenus && (
               <motion.div
                 className="hh-dropdown"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 8 }}
-                transition={{ duration: 0.18, ease: "easeOut" }}
+                initial={{ opacity: 0, y: 10, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.97 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
                 onMouseEnter={() => clearTimeout(closeTimer.current)}
                 onMouseLeave={closeNav}
               >
@@ -109,7 +104,7 @@ export default function Nav({ onNav, current, isAdmin }) {
                           return (
                             <li key={subItem.label}>
                               <button className="hh-dropdown-item" onClick={() => go(subItem.key)}>
-                                <span className="hh-dropdown-icon"><Icon size={18} /></span>
+                                <span className="hh-dropdown-icon"><Icon size={16} /></span>
                                 <span className="hh-dropdown-text">
                                   <span className="hh-dropdown-label">{subItem.label}</span>
                                   <span className="hh-dropdown-desc">{subItem.description}</span>
@@ -131,67 +126,74 @@ export default function Nav({ onNav, current, isAdmin }) {
   );
 
   return (
-    <header className={`hh-nav ${isScrolled ? "is-scrolled" : ""}`}>
+    <>
+      <header className={`hh-nav ${isScrolled ? "is-scrolled" : ""}`}>
+        <div className="hh-nav-island">
 
-      {/* ── Left: logo ── */}
-      <button className="hh-logo hh-nav-left-logo" onClick={() => go("home")}>
-        <img src="/logo.svg" alt="Homely" className="hh-logo-img" />
-        <span className="hh-logo-word">Homely</span>
-      </button>
-
-      {/* ── Center: nav links ── */}
-      <nav className="hh-nav-center">
-        <NavLinks />
-      </nav>
-
-      {/* ── Right: auth ── */}
-      <div className="hh-nav-right">
-        {user ? (
-          <button
-            className={`hh-link hh-link-cta ${current === "dashboard" ? "is-active" : ""}`}
-            onClick={() => go("dashboard")}
-          >
-            {isAdmin ? "Admin" : profile?.name?.split(" ")[0] || "Dashboard"}
+          {/* Logo */}
+          <button className="hh-logo" onClick={() => go("home")}>
+            <img src="/logo.svg" alt="Homely" className="hh-logo-img" />
+            <span className="hh-logo-word">Homely</span>
           </button>
-        ) : (
-          <>
-            <button className="hh-link hh-link-cta" onClick={() => go("properties")}>
-              Book a stay
-            </button>
-            <button className="hh-link hh-link-signin" onClick={() => go("login")}>
-              Sign in
-            </button>
-          </>
-        )}
-      </div>
 
-      {/* ── Mobile burger ── */}
-      <button className="hh-burger" onClick={() => setMobileOpen((o) => !o)} aria-label="Menu">
-        <span /><span /><span />
-      </button>
+          <span className="hh-nav-sep" />
 
-      {/* ── Mobile drawer ── */}
+          {/* Desktop links */}
+          <nav className="hh-nav-links">
+            <NavLinks />
+          </nav>
+
+          {/* Desktop auth */}
+          <div className="hh-nav-actions">
+            {user ? (
+              <button
+                className={`hh-nav-book ${current === "dashboard" ? "is-active" : ""}`}
+                onClick={() => go("dashboard")}
+              >
+                {isAdmin ? "Admin" : profile?.name?.split(" ")[0] || "Dashboard"}
+              </button>
+            ) : (
+              <>
+                <button className="hh-nav-book" onClick={() => go("properties")}>Book a stay</button>
+                <button className="hh-link-signin" onClick={() => go("login")}>Sign in</button>
+              </>
+            )}
+          </div>
+
+          {/* Mobile burger */}
+          <button
+            className={`hh-burger ${mobileOpen ? "is-open" : ""}`}
+            onClick={() => setMobileOpen(o => !o)}
+            aria-label="Menu"
+          >
+            <span /><span /><span />
+          </button>
+
+        </div>
+      </header>
+
+      {/* Mobile drawer */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             className="hh-mobile-drawer"
-            initial={{ opacity: 0, y: -8 }}
+            initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.22 }}
           >
-            <NavLinks />
+            <NavLinks mobile />
             <div className="hh-mobile-auth">
               {user ? (
-                <button className="hh-link hh-link-cta" style={{ width: "100%", textAlign: "center" }} onClick={() => go("dashboard")}>
+                <button className="hh-nav-book" style={{ width: "100%", justifyContent: "center" }} onClick={() => go("dashboard")}>
                   {isAdmin ? "Admin" : profile?.name?.split(" ")[0] || "Dashboard"}
                 </button>
               ) : (
                 <>
-                  <button className="hh-link hh-link-cta" style={{ width: "100%", textAlign: "center" }} onClick={() => go("properties")}>
+                  <button className="hh-nav-book" style={{ width: "100%", justifyContent: "center" }} onClick={() => go("properties")}>
                     Book a stay
                   </button>
-                  <button className="hh-link hh-link-signin" style={{ width: "100%", textAlign: "center" }} onClick={() => go("login")}>
+                  <button className="hh-link-signin" style={{ width: "100%", textAlign: "center" }} onClick={() => go("login")}>
                     Sign in
                   </button>
                 </>
@@ -200,6 +202,6 @@ export default function Nav({ onNav, current, isAdmin }) {
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 }
