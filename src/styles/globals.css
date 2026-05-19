@@ -743,13 +743,20 @@
 
 /* ── Nav sign-in ── */
 .hh-link-signin {
-  background: none; border: 1.5px solid var(--ink);
-  color: var(--ink); border-radius: 999px;
-  padding: 6px 16px; font-size: .875rem; font-weight: 600;
-  cursor: pointer; transition: background .15s;
+  background: var(--terra); border: 1.5px solid var(--terra);
+  color: #fff; border-radius: 999px;
+  padding: 7px 20px; font-size: .875rem; font-weight: 600;
+  cursor: pointer; transition: background .2s, box-shadow .2s, transform .15s;
   margin-left: .5rem;
+  box-shadow: 0 2px 10px rgba(196,98,45,0.30);
+  letter-spacing: 0.01em;
 }
-.hh-link-signin:hover { background: rgba(0,0,0,.06); }
+.hh-link-signin:hover {
+  background: #a84e22;
+  border-color: #a84e22;
+  box-shadow: 0 4px 18px rgba(196,98,45,0.40);
+  transform: translateY(-1px);
+}
 
 /* ═══════════════════════════════════════════════════════════════
    DASHBOARD
